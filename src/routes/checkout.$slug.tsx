@@ -484,6 +484,22 @@ function Checkout() {
                 <span className="hidden sm:inline">·</span>
                 <span>Entrega imediata</span>
               </div>
+
+              <div className="pt-2 text-center text-[11px] text-muted-foreground border-t border-border/40">
+                Ao clicar em finalizar compra, você declara que leu e concorda com os nossos{" "}
+                <Link to="/termos" target="_blank" className="text-gold underline hover:opacity-80">
+                  Termos de Uso
+                </Link>{" "}
+                e{" "}
+                <Link
+                  to="/privacidade"
+                  target="_blank"
+                  className="text-gold underline hover:opacity-80"
+                >
+                  Política de Privacidade
+                </Link>
+                .
+              </div>
             </div>
           </form>
 

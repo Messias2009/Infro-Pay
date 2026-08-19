@@ -233,6 +233,12 @@ export function Header({ variant = "default" }: { variant?: HeaderVariant }) {
           >
             FAQ
           </a>
+          <Link
+            to="/contactos"
+            className="px-3 py-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/40 transition"
+          >
+            Contactos
+          </Link>
         </nav>
 
         {/* Desktop Buttons */}
@@ -370,6 +376,29 @@ export function Header({ variant = "default" }: { variant?: HeaderVariant }) {
                   >
                     <span>FAQ</span>
                   </a>
+                  <Link
+                    to="/contactos"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between p-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition"
+                  >
+                    <span>Contactos</span>
+                  </Link>
+                  <div className="my-2 border-t border-border/40 pt-2 flex flex-col gap-1">
+                    <Link
+                      to="/termos"
+                      onClick={() => setMobileOpen(false)}
+                      className="px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      Termos de Uso
+                    </Link>
+                    <Link
+                      to="/privacidade"
+                      onClick={() => setMobileOpen(false)}
+                      className="px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      Política de Privacidade
+                    </Link>
+                  </div>
                 </nav>
               </div>
 

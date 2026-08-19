@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { dispatchNotification } from "./notifications.server";
 
 async function assertAdmin(supabase: any, userId: string) {
   const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
@@ -63,11 +64,33 @@ export const approveProduct = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const { data: prod } = await context.supabase
+      .from("products")
+      .select("title, producer_id, slug")
+      .eq("id", data.id)
+      .maybeSingle();
+
     const { error } = await context.supabase
       .from("products")
       .update({ status: "publicado", rejection_reason: null })
       .eq("id", data.id);
     if (error) throw error;
+
+    if (prod?.producer_id) {
+      try {
+        await dispatchNotification({
+          userId: prod.producer_id,
+          type: "product_approved",
+          title: "🎉 Produto Aprovado!",
+          message: `O seu produto "${prod.title}" foi aprovado pela equipa e já está disponível para venda.`,
+          link: `/produtor/produtos/${prod.slug}`,
+          channels: ["in_app", "push", "email"],
+        });
+      } catch (nErr) {
+        console.warn("Erro ao notificar aprovação de produto:", nErr);
+      }
+    }
+
     await logAdminAction(context.supabase, context.userId, "product_approved", "product", data.id);
     return { ok: true };
   });
@@ -79,11 +102,33 @@ export const rejectProduct = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const { data: prod } = await context.supabase
+      .from("products")
+      .select("title, producer_id, slug")
+      .eq("id", data.id)
+      .maybeSingle();
+
     const { error } = await context.supabase
       .from("products")
       .update({ status: "rascunho", rejection_reason: data.reason })
       .eq("id", data.id);
     if (error) throw error;
+
+    if (prod?.producer_id) {
+      try {
+        await dispatchNotification({
+          userId: prod.producer_id,
+          type: "product_rejected",
+          title: "⚠️ Revisão Necessária no Produto",
+          message: `O produto "${prod.title}" necessita de ajustes: ${data.reason}`,
+          link: `/produtor/produtos/${prod.slug}`,
+          channels: ["in_app", "push", "email"],
+        });
+      } catch (nErr) {
+        console.warn("Erro ao notificar rejeição de produto:", nErr);
+      }
+    }
+
     await logAdminAction(context.supabase, context.userId, "product_rejected", "product", data.id, {
       reason: data.reason,
     });

@@ -14,6 +14,23 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow write: if isOwner(userId);
+
+      // User notifications subcollection
+      match /notifications/{notificationId} {
+        allow read: if isOwner(userId);
+        allow update, delete: if isOwner(userId);
+        allow create: if isAuthenticated();
+      }
+
+      // User FCM device tokens
+      match /fcm_tokens/{tokenId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // User notification preferences
+      match /preferences/{prefId} {
+        allow read, write: if isOwner(userId);
+      }
     }
 
     // Products Collection
@@ -31,6 +48,12 @@ service cloud.firestore {
       );
       allow create: if true;
       allow update, delete: if isAuthenticated() && resource.data.sellerId == request.auth.uid;
+    }
+
+    // Admin Broadcasts Collection
+    match /admin_broadcasts/{broadcastId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
 
     // Test connection doc

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { dispatchNotification } from "./notifications.server";
 
 export const MIN_WITHDRAWAL_CENTS = 500_000; // 5.000 Kz
 export const WITHDRAWAL_FEE = 0.08;
@@ -101,6 +102,23 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
       .select()
       .maybeSingle();
     if (error) throw new Error(error.message ?? "Falha ao pedir saque");
+
+    // Dispatch withdrawal requested notification
+    try {
+      await dispatchNotification({
+        userId: context.userId,
+        type: "withdrawal_requested",
+        title: "📤 Solicitação de Saque Recebida",
+        message: `O seu pedido de levantamento de ${(data.gross_cents / 100).toLocaleString("pt-AO")} Kz foi submetido para análise.`,
+        data: { amountCents: data.gross_cents },
+        relatedId: row?.id,
+        relatedType: "withdrawal",
+        link: "/produtor/saques",
+      });
+    } catch (nErr) {
+      console.warn("Erro ao despachar notificação de saque solicitado:", nErr);
+    }
+
     return row;
   });
 
@@ -150,11 +168,65 @@ export const updateWithdrawalStatus = createServerFn({ method: "POST" })
     const patch: any = { status: data.status };
     if (data.status === "recusado")
       patch.rejection_reason = data.rejection_reason ?? "Sem motivo indicado";
+
+    // Fetch withdrawal details for notification
+    const { data: currentW } = await (context.supabase as any)
+      .from("withdrawals")
+      .select("*, bank_account:bank_accounts(bank_name, iban)")
+      .eq("id", data.id)
+      .maybeSingle();
+
     const { error } = await (context.supabase as any)
       .from("withdrawals")
       .update(patch)
       .eq("id", data.id);
     if (error) throw error;
+
+    // Dispatch status update notification to producer
+    if (currentW?.producer_id) {
+      try {
+        const notifType =
+          data.status === "aprovado" || data.status === "pago"
+            ? "withdrawal_approved"
+            : data.status === "em_analise"
+              ? "withdrawal_processing"
+              : "withdrawal_rejected";
+
+        const title =
+          data.status === "aprovado" || data.status === "pago"
+            ? "💰 Saque Aprovado e Transferido!"
+            : data.status === "em_analise"
+              ? "⏳ Saque em Análise Bancária"
+              : "⚠️ Saque Recusado";
+
+        const formatted = (currentW.gross_cents / 100).toLocaleString("pt-AO") + " Kz";
+        const message =
+          data.status === "aprovado" || data.status === "pago"
+            ? `O seu levantamento de ${formatted} foi processado e creditado com sucesso.`
+            : data.status === "em_analise"
+              ? `O seu levantamento de ${formatted} está a ser analisado pela equipa financeira.`
+              : `O seu pedido de levantamento de ${formatted} foi recusado.${data.rejection_reason ? ` Motivo: ${data.rejection_reason}` : ""}`;
+
+        await dispatchNotification({
+          userId: currentW.producer_id,
+          type: notifType,
+          title,
+          message,
+          data: {
+            amountCents: currentW.gross_cents,
+            bankName: currentW.bank_account?.bank_name,
+            iban: currentW.bank_account?.iban,
+            reason: data.rejection_reason,
+          },
+          relatedId: data.id,
+          relatedType: "withdrawal",
+          link: "/produtor/saques",
+        });
+      } catch (nErr) {
+        console.warn("Erro ao despachar notificação de atualização de saque:", nErr);
+      }
+    }
+
     const { logAdminAction } = await import("./admin.functions");
     await logAdminAction(
       context.supabase,

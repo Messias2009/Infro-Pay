@@ -46,12 +46,105 @@
         "createdAt": { "type": "string", "description": "ISO timestamp" }
       },
       "required": ["id", "productId", "sellerId", "customerEmail", "amountCents", "status", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app and push notification record for a user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Notification unique ID" },
+        "userId": { "type": "string", "description": "Recipient Auth UID" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "sale_approved",
+            "sale_created",
+            "withdrawal_requested",
+            "withdrawal_approved",
+            "withdrawal_rejected",
+            "withdrawal_processing",
+            "product_approved",
+            "product_rejected",
+            "platform_update",
+            "security_alert",
+            "system_alert"
+          ],
+          "description": "Notification category"
+        },
+        "title": { "type": "string", "description": "Notification title" },
+        "message": { "type": "string", "description": "Notification content/body" },
+        "data": { "type": "string", "description": "Serialized JSON metadata" },
+        "link": { "type": "string", "description": "Target redirection route" },
+        "read": { "type": "boolean", "description": "Read status" },
+        "readAt": { "type": "string", "description": "ISO timestamp when read" },
+        "idempotencyKey": { "type": "string", "description": "Unique key to prevent duplicate notifications" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "userId", "type", "title", "message", "read", "createdAt"]
+    },
+    "FCMToken": {
+      "title": "FCMToken",
+      "description": "Web Push / Firebase Cloud Messaging token for device",
+      "type": "object",
+      "properties": {
+        "token": { "type": "string", "description": "Device FCM registration token" },
+        "userId": { "type": "string", "description": "Device owner Auth UID" },
+        "platform": { "type": "string", "description": "Browser / OS platform" },
+        "userAgent": { "type": "string", "description": "Client User-Agent" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["token", "userId", "createdAt"]
+    },
+    "NotificationPreferences": {
+      "title": "NotificationPreferences",
+      "description": "User notification channel preferences",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID" },
+        "pushEnabled": { "type": "boolean", "description": "Push notifications toggle" },
+        "emailSales": { "type": "boolean", "description": "Sale emails toggle" },
+        "emailWithdrawals": { "type": "boolean", "description": "Withdrawal emails toggle" },
+        "emailUpdates": { "type": "boolean", "description": "Platform updates emails toggle" },
+        "securityAlerts": { "type": "boolean", "description": "Security alerts toggle (always true)" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["userId", "pushEnabled", "emailSales", "emailWithdrawals", "emailUpdates"]
+    },
+    "AdminBroadcast": {
+      "title": "AdminBroadcast",
+      "description": "Platform-wide broadcast announcement created by admin",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Broadcast unique ID" },
+        "adminId": { "type": "string", "description": "Admin Auth UID" },
+        "title": { "type": "string", "description": "Announcement title" },
+        "message": { "type": "string", "description": "Announcement content" },
+        "type": { "type": "string", "description": "Broadcast type" },
+        "audience": { "type": "string", "enum": ["all", "sellers", "buyers", "specific"], "description": "Target audience" },
+        "channels": { "type": "string", "description": "JSON array of channels (in_app, push, email)" },
+        "sentCount": { "type": "number", "description": "Number of users reached" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "adminId", "title", "message", "audience", "createdAt"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
       "description": "User profiles collection"
+    },
+    "/users/{userId}/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "User in-app notifications subcollection"
+    },
+    "/users/{userId}/fcm_tokens/{tokenId}": {
+      "schema": { "$ref": "#/entities/FCMToken" },
+      "description": "User registered FCM push tokens"
+    },
+    "/users/{userId}/preferences/notifications": {
+      "schema": { "$ref": "#/entities/NotificationPreferences" },
+      "description": "User notification channel preferences"
     },
     "/products/{productId}": {
       "schema": { "$ref": "#/entities/Product" },
@@ -60,6 +153,10 @@
     "/orders/{orderId}": {
       "schema": { "$ref": "#/entities/Order" },
       "description": "Orders collection"
+    },
+    "/admin_broadcasts/{broadcastId}": {
+      "schema": { "$ref": "#/entities/AdminBroadcast" },
+      "description": "Platform broadcast announcements"
     }
   }
 }

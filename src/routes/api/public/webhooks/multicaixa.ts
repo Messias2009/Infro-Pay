@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createHmac, timingSafeEqual } from "crypto";
+import { dispatchNotification } from "@/lib/notifications.server";
 
 // Webhook Multicaixa (genérico, HMAC-SHA256).
 // Configura no painel do provedor:
@@ -48,14 +49,43 @@ export const Route = createFileRoute("/api/public/webhooks/multicaixa")({
         if (dupErr) return new Response("ok (duplicate)", { status: 200 });
 
         if (status === "paid" || status === "success") {
-          await supabaseAdmin
+          const { data: updatedSale } = await supabaseAdmin
             .from("sales")
             .update({
               status: "pago",
               paid_at: new Date().toISOString(),
               provider: "multicaixa",
             })
-            .eq("access_token", reference);
+            .eq("access_token", reference)
+            .select("*, product:products(title, slug)")
+            .maybeSingle();
+
+          // Dispatch Venda Aprovada Notification
+          if (updatedSale?.producer_id) {
+            try {
+              const formattedGross =
+                (updatedSale.gross_cents / 100).toLocaleString("pt-AO") + " Kz";
+              await dispatchNotification({
+                userId: updatedSale.producer_id,
+                type: "sale_approved",
+                title: "🎉 Venda Aprovada!",
+                message: `Você acabou de vender o produto "${(updatedSale as any).product?.title || "Infoproduto"}" por ${formattedGross}.`,
+                data: {
+                  productTitle: (updatedSale as any).product?.title,
+                  buyerName: updatedSale.buyer_name,
+                  buyerEmail: updatedSale.buyer_email,
+                  amountCents: updatedSale.gross_cents,
+                  netCents: updatedSale.net_cents,
+                  paymentMethod: "Multicaixa",
+                },
+                relatedId: updatedSale.id,
+                relatedType: "sale",
+                link: "/produtor",
+              });
+            } catch (notifErr) {
+              console.warn("Erro ao despachar notificação de venda aprovada:", notifErr);
+            }
+          }
         } else if (status === "failed" || status === "cancelled") {
           await supabaseAdmin
             .from("sales")
