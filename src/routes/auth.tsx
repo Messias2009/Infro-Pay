@@ -1,7 +1,15 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
-import { useState } from "react";
-import { Mail, Lock, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  ArrowLeft,
+  KeyRound,
+  CheckCircle2,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -11,22 +19,32 @@ import { Label } from "@/components/ui/label";
 import heroBg from "@/assets/hero-banner.jpg";
 import logoMark from "@/assets/infropay-mark.png";
 
-const search = z.object({ mode: z.enum(["signin", "signup"]).optional() });
+const search = z.object({ mode: z.enum(["signin", "signup", "forgot"]).optional() });
 
 export const Route = createFileRoute("/auth")({
   validateSearch: search,
-  head: () => ({ meta: [{ title: "Entrar — InfroPay" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Entrar — InfroPay" }, { name: "robots", content: "noindex" }],
+  }),
   component: AuthPage,
 });
 
 function AuthPage() {
   const router = useRouter();
-  const { mode: initial } = Route.useSearch();
-  const [mode, setMode] = useState<"signin" | "signup">(initial ?? "signin");
+  const searchParams = Route.useSearch();
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">(searchParams.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+
+  // Sync mode if search param changes
+  useEffect(() => {
+    if (searchParams.mode) {
+      setMode(searchParams.mode);
+    }
+  }, [searchParams.mode]);
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
@@ -34,18 +52,42 @@ function AuthPage() {
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
-          email,
+          email: email.trim(),
           password,
-          options: { emailRedirectTo: window.location.origin, data: { full_name: name } },
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth`,
+            data: { full_name: name.trim() },
+          },
         });
         if (error) throw error;
         toast.success("Conta criada com sucesso!");
         router.navigate({ to: "/produtor" });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+      } else if (mode === "signin") {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
         router.navigate({ to: "/produtor" });
+      } else if (mode === "forgot") {
+        if (!email.trim()) {
+          toast.error("Por favor, introduza o seu endereço de e-mail.");
+          return;
+        }
+
+        try {
+          const redirectTo = `${window.location.origin}/redefinir-senha`;
+          await supabase.auth.resetPasswordForEmail(email.trim(), {
+            redirectTo,
+          });
+        } catch (recoveryErr) {
+          console.warn("Informação de recuperação de senha:", recoveryErr);
+        }
+
+        // Generic response to strictly prevent user enumeration
+        setForgotSent(true);
+        toast.success("Pedido de recuperação processado.");
       }
     } catch (err) {
       toast.error((err as Error).message);
@@ -73,7 +115,8 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen relative grid lg:grid-cols-2">
+    <div className="min-h-screen relative grid lg:grid-cols-2 bg-background text-foreground">
+      {/* Left Marketing / Branding Column */}
       <div className="relative hidden lg:block overflow-hidden">
         <img src={heroBg} alt="" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-background/85 via-background/70 to-background/95" />
@@ -82,7 +125,7 @@ function AuthPage() {
           <Link to="/" className="inline-flex items-center gap-2.5">
             <img
               src={logoMark}
-              alt=""
+              alt="InfroPay"
               width={512}
               height={512}
               className="h-10 w-10 rounded-lg object-contain"
@@ -96,21 +139,22 @@ function AuthPage() {
               A plataforma onde o seu <span className="text-gradient-gold">conhecimento</span> vira
               renda.
             </h2>
-            <p className="mt-4 text-muted-foreground max-w-md">
-              Checkout de alta conversão, pagamentos locais e internacionais, painel completo. Sem
-              complicação técnica.
+            <p className="mt-4 text-muted-foreground max-w-md text-sm leading-relaxed">
+              Checkout de alta conversão, pagamentos locais Multicaixa GPO e internacionais, painel
+              completo. Sem complicação técnica.
             </p>
           </div>
           <div className="text-xs text-muted-foreground">© {new Date().getFullYear()} InfroPay</div>
         </div>
       </div>
 
+      {/* Right Action Column */}
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           <Link to="/" className="lg:hidden inline-flex items-center gap-2 mb-8">
             <img
               src={logoMark}
-              alt=""
+              alt="InfroPay"
               width={512}
               height={512}
               className="h-8 w-8 rounded-lg object-contain"
@@ -120,95 +164,216 @@ function AuthPage() {
             </span>
           </Link>
 
-          <h1 className="text-3xl font-bold tracking-tight">
-            {mode === "signup" ? "Criar conta" : "Bem-vindo de volta"}
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {mode === "signup" ? "Comece a vender em minutos." : "Aceda ao seu painel."}
-          </p>
-
-          <Button
-            onClick={handleGoogle}
-            variant="outline"
-            className="w-full mt-8 h-11"
-            disabled={loading}
-          >
-            <GoogleIcon className="h-4 w-4 mr-2" />
-            Continuar com Google
-          </Button>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase tracking-wider">
-              <span className="bg-background px-3 text-muted-foreground">ou</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleEmail} className="space-y-4">
-            {mode === "signup" && (
+          {mode === "forgot" ? (
+            /* Forgot Password View */
+            <div className="space-y-6">
               <div>
-                <Label htmlFor="name">Nome completo</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="O seu nome"
-                  className="mt-1.5"
-                />
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-medium mb-3">
+                  <KeyRound className="h-3.5 w-3.5" />
+                  Recuperação de Senha
+                </div>
+                <h1 className="text-3xl font-bold tracking-tight">Recuperar senha</h1>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Introduza o endereço de e-mail associado à sua conta para enviarmos o link seguro
+                  de redefinição.
+                </p>
               </div>
-            )}
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <div className="relative mt-1.5">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="voce@email.com"
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="password">Palavra-passe</Label>
-              <div className="relative mt-1.5">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="pl-9"
-                />
-              </div>
-            </div>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-11 gradient-brand text-primary-foreground shadow-glow"
-            >
-              {loading ? "A processar..." : mode === "signup" ? "Criar conta" : "Entrar"}
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </form>
 
-          <p className="mt-6 text-sm text-center text-muted-foreground">
-            {mode === "signup" ? "Já tem conta?" : "Ainda não tem conta?"}{" "}
-            <button
-              onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-              className="text-primary-glow hover:underline font-medium"
-            >
-              {mode === "signup" ? "Entrar" : "Criar conta"}
-            </button>
-          </p>
+              {forgotSent ? (
+                <div className="space-y-5 rounded-2xl border border-primary/20 bg-primary/5 p-6 backdrop-blur-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20">
+                      <CheckCircle2 className="h-5 w-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-foreground">
+                        Pedido de recuperação enviado
+                      </p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Se este e-mail estiver cadastrado, você receberá um link para redefinir sua
+                        senha.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg bg-background/50 border border-border/40 p-3 text-xs text-muted-foreground space-y-1">
+                    <p className="font-medium text-foreground">Não recebeu o e-mail?</p>
+                    <ul className="list-disc list-inside space-y-0.5 text-[11px]">
+                      <li>Verifique a caixa de Spam ou Lixo Eletrónico.</li>
+                      <li>Aguarde alguns instantes e confirme se digitou o e-mail correto.</li>
+                    </ul>
+                  </div>
+
+                  <div className="pt-2 space-y-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setForgotSent(false)}
+                      className="w-full text-xs h-10 border-border/60"
+                    >
+                      Tentar outro e-mail
+                    </Button>
+
+                    <Button
+                      type="button"
+                      onClick={() => setMode("signin")}
+                      className="w-full h-11 gradient-brand text-primary-foreground shadow-glow font-medium"
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      Voltar para o login
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleEmail} className="space-y-4">
+                  <div>
+                    <Label htmlFor="forgot-email">E-mail da sua conta</Label>
+                    <div className="relative mt-1.5">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="forgot-email"
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="voce@email.com"
+                        className="pl-9"
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={loading || !email.trim()}
+                    className="w-full h-11 gradient-brand text-primary-foreground shadow-glow font-medium"
+                  >
+                    {loading ? "A enviar link..." : "Enviar link de recuperação"}
+                    <ArrowRight className="ml-1.5 h-4 w-4" />
+                  </Button>
+
+                  <div className="pt-2 text-center">
+                    <button
+                      type="button"
+                      onClick={() => setMode("signin")}
+                      className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
+                      Voltar para o login
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          ) : (
+            /* Sign In / Sign Up Views */
+            <>
+              <h1 className="text-3xl font-bold tracking-tight">
+                {mode === "signup" ? "Criar conta" : "Bem-vindo de volta"}
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {mode === "signup" ? "Comece a vender em minutos." : "Aceda ao seu painel."}
+              </p>
+
+              <Button
+                onClick={handleGoogle}
+                variant="outline"
+                className="w-full mt-8 h-11"
+                disabled={loading}
+              >
+                <GoogleIcon className="h-4 w-4 mr-2" />
+                Continuar com Google
+              </Button>
+
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase tracking-wider">
+                  <span className="bg-background px-3 text-muted-foreground">ou</span>
+                </div>
+              </div>
+
+              <form onSubmit={handleEmail} className="space-y-4">
+                {mode === "signup" && (
+                  <div>
+                    <Label htmlFor="name">Nome completo</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="O seu nome"
+                      className="mt-1.5"
+                    />
+                  </div>
+                )}
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative mt-1.5">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="voce@email.com"
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Palavra-passe</Label>
+                    {mode === "signin" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotSent(false);
+                          setMode("forgot");
+                        }}
+                        className="text-xs text-primary-glow hover:underline transition-colors font-medium"
+                      >
+                        Esqueceu sua senha?
+                      </button>
+                    )}
+                  </div>
+                  <div className="relative mt-1.5">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-11 gradient-brand text-primary-foreground shadow-glow"
+                >
+                  {loading ? "A processar..." : mode === "signup" ? "Criar conta" : "Entrar"}
+                  <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              </form>
+
+              <p className="mt-6 text-sm text-center text-muted-foreground">
+                {mode === "signup" ? "Já tem conta?" : "Ainda não tem conta?"}{" "}
+                <button
+                  onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+                  className="text-primary-glow hover:underline font-medium"
+                >
+                  {mode === "signup" ? "Entrar" : "Criar conta"}
+                </button>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>
