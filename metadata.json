@@ -1,0 +1,6 @@
+{
+  "name": "InfroPay",
+  "description": "Digital products, affiliate management, checkout, and payment platform for creators.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

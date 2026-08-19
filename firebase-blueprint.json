@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile in InfroPay",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "displayName": { "type": "string", "description": "Full name or producer name" },
+        "role": { "type": "string", "enum": ["user", "seller", "admin"], "description": "User role" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "email", "role", "createdAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Digital product listed by a producer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Product unique ID" },
+        "sellerId": { "type": "string", "description": "Seller Auth UID" },
+        "title": { "type": "string", "description": "Product title" },
+        "description": { "type": "string", "description": "Product description" },
+        "priceCents": { "type": "number", "description": "Price in Angolan Kwanza cents" },
+        "category": { "type": "string", "description": "Product category" },
+        "format": { "type": "string", "description": "File or course format" },
+        "status": { "type": "string", "enum": ["draft", "active", "archived"], "description": "Publication status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "sellerId", "title", "priceCents", "status", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Order for a digital product",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Order ID" },
+        "productId": { "type": "string", "description": "Purchased product ID" },
+        "sellerId": { "type": "string", "description": "Seller Auth UID" },
+        "customerEmail": { "type": "string", "format": "email", "description": "Buyer email" },
+        "customerName": { "type": "string", "description": "Buyer name" },
+        "amountCents": { "type": "number", "description": "Paid amount in Kz cents" },
+        "status": { "type": "string", "enum": ["pending", "paid", "failed", "cancelled"], "description": "Payment status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "productId", "sellerId", "customerEmail", "amountCents", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profiles collection"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Digital products collection"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Orders collection"
+    }
+  }
+}
