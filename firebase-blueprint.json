@@ -5,14 +5,33 @@
       "description": "User profile in InfroPay",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "description": "Auth UID" },
+        "uid": { "type": "string", "description": "Auth UID" },
+        "name": { "type": "string", "description": "Full name or producer name" },
         "email": { "type": "string", "format": "email", "description": "User email address" },
-        "displayName": { "type": "string", "description": "Full name or producer name" },
+        "photoURL": { "type": "string", "description": "User avatar image URL" },
         "role": { "type": "string", "enum": ["user", "seller", "admin"], "description": "User role" },
+        "status": { "type": "string", "enum": ["active", "suspended", "banned"], "description": "Account status" },
         "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" },
+        "lastLoginAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    },
+    "Wallet": {
+      "title": "Wallet",
+      "description": "User financial wallet balance and aggregate totals",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Auth UID" },
+        "availableBalance": { "type": "number", "description": "Available balance in AOA" },
+        "pendingBalance": { "type": "number", "description": "Pending balance in AOA" },
+        "totalSales": { "type": "number", "description": "Gross total sales in AOA" },
+        "totalWithdrawn": { "type": "number", "description": "Total net amount withdrawn in AOA" },
+        "totalSaleFees": { "type": "number", "description": "Total 2% sale fees charged in AOA" },
+        "totalWithdrawalFees": { "type": "number", "description": "Total 6% withdrawal fees charged in AOA" },
         "updatedAt": { "type": "string", "description": "ISO timestamp" }
       },
-      "required": ["id", "email", "role", "createdAt"]
+      "required": ["userId", "availableBalance", "pendingBalance", "totalSales", "totalWithdrawn"]
     },
     "Product": {
       "title": "Product",
@@ -21,31 +40,107 @@
       "properties": {
         "id": { "type": "string", "description": "Product unique ID" },
         "sellerId": { "type": "string", "description": "Seller Auth UID" },
-        "title": { "type": "string", "description": "Product title" },
+        "name": { "type": "string", "description": "Product title" },
         "description": { "type": "string", "description": "Product description" },
-        "priceCents": { "type": "number", "description": "Price in Angolan Kwanza cents" },
-        "category": { "type": "string", "description": "Product category" },
-        "format": { "type": "string", "description": "File or course format" },
-        "status": { "type": "string", "enum": ["draft", "active", "archived"], "description": "Publication status" },
-        "createdAt": { "type": "string", "description": "ISO timestamp" }
+        "price": { "type": "number", "description": "Price in Angolan Kwanzas (AOA)" },
+        "image": { "type": "string", "description": "Product cover image URL" },
+        "status": { "type": "string", "enum": ["draft", "pending", "active", "archived", "rejected"], "description": "Publication status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
       },
-      "required": ["id", "sellerId", "title", "priceCents", "status", "createdAt"]
+      "required": ["id", "sellerId", "name", "price", "status", "createdAt"]
     },
-    "Order": {
-      "title": "Order",
-      "description": "Order for a digital product",
+    "Sale": {
+      "title": "Sale",
+      "description": "Sale record with strictly calculated 2% platform commission",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "description": "Order ID" },
-        "productId": { "type": "string", "description": "Purchased product ID" },
+        "id": { "type": "string", "description": "Sale transaction unique ID" },
         "sellerId": { "type": "string", "description": "Seller Auth UID" },
-        "customerEmail": { "type": "string", "format": "email", "description": "Buyer email" },
-        "customerName": { "type": "string", "description": "Buyer name" },
-        "amountCents": { "type": "number", "description": "Paid amount in Kz cents" },
-        "status": { "type": "string", "enum": ["pending", "paid", "failed", "cancelled"], "description": "Payment status" },
+        "buyerId": { "type": "string", "description": "Buyer Auth UID if authenticated" },
+        "buyerName": { "type": "string", "description": "Buyer full name" },
+        "buyerEmail": { "type": "string", "format": "email", "description": "Buyer email" },
+        "productId": { "type": "string", "description": "Purchased product unique ID" },
+        "productName": { "type": "string", "description": "Snapshot of product title" },
+        "grossAmount": { "type": "number", "description": "Gross sale amount in AOA" },
+        "platformFeePercent": { "type": "number", "description": "Commission percent applied (2)" },
+        "platformFeeAmount": { "type": "number", "description": "Commission fee amount in AOA (gross * 0.02)" },
+        "sellerNetAmount": { "type": "number", "description": "Net amount credited to seller in AOA (gross - fee)" },
+        "paymentMethod": { "type": "string", "description": "Payment gateway method used" },
+        "status": { "type": "string", "enum": ["pending", "paid", "cancelled", "refunded"], "description": "Payment status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "sellerId", "productId", "grossAmount", "platformFeePercent", "platformFeeAmount", "sellerNetAmount", "status", "createdAt"]
+    },
+    "Withdrawal": {
+      "title": "Withdrawal",
+      "description": "Withdrawal request with strictly calculated 6% withdrawal fee",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Withdrawal unique ID" },
+        "userId": { "type": "string", "description": "Producer Auth UID" },
+        "requestedAmount": { "type": "number", "description": "Gross requested amount in AOA" },
+        "withdrawalFeePercent": { "type": "number", "description": "Withdrawal fee percent applied (6)" },
+        "withdrawalFeeAmount": { "type": "number", "description": "Withdrawal fee amount in AOA (requested * 0.06)" },
+        "netAmount": { "type": "number", "description": "Net amount to transfer to producer in AOA (requested - fee)" },
+        "method": { "type": "string", "description": "Withdrawal channel (e.g., bank_transfer)" },
+        "accountDetails": { "type": "string", "description": "JSON or formatted bank details (IBAN, Holder, Bank)" },
+        "status": { "type": "string", "enum": ["pending", "in_review", "approved", "paid", "rejected"], "description": "Withdrawal lifecycle status" },
+        "idempotencyKey": { "type": "string", "description": "Unique key ensuring atomic, non-duplicate withdrawal" },
+        "requestedAt": { "type": "string", "description": "ISO timestamp" },
+        "processedAt": { "type": "string", "description": "ISO timestamp when processed" },
+        "processedBy": { "type": "string", "description": "Admin UID who processed withdrawal" },
+        "rejectionReason": { "type": "string", "description": "Reason given if rejected" }
+      },
+      "required": ["id", "userId", "requestedAmount", "withdrawalFeePercent", "withdrawalFeeAmount", "netAmount", "status", "requestedAt"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Unified ledger entry for all financial movements",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Transaction ID" },
+        "userId": { "type": "string", "description": "User Auth UID" },
+        "type": { "type": "string", "enum": ["sale", "commission", "withdrawal", "fee", "credit", "debit"], "description": "Transaction category" },
+        "amount": { "type": "number", "description": "Gross amount in AOA" },
+        "fee": { "type": "number", "description": "Fee amount in AOA" },
+        "netAmount": { "type": "number", "description": "Net amount in AOA" },
+        "referenceId": { "type": "string", "description": "Associated saleId or withdrawalId" },
+        "status": { "type": "string", "enum": ["pending", "completed", "failed", "cancelled"], "description": "Transaction status" },
+        "description": { "type": "string", "description": "Human readable description" },
         "createdAt": { "type": "string", "description": "ISO timestamp" }
       },
-      "required": ["id", "productId", "sellerId", "customerEmail", "amountCents", "status", "createdAt"]
+      "required": ["id", "userId", "type", "amount", "fee", "netAmount", "status", "createdAt"]
+    },
+    "PlatformSettings": {
+      "title": "PlatformSettings",
+      "description": "Global platform financial configuration",
+      "type": "object",
+      "properties": {
+        "saleFeePercent": { "type": "number", "description": "Global commission percent per sale (2)" },
+        "withdrawalFeePercent": { "type": "number", "description": "Global withdrawal fee percent (6)" },
+        "currency": { "type": "string", "description": "Platform default currency (AOA)" },
+        "minimumWithdrawal": { "type": "number", "description": "Minimum withdrawal amount in AOA (5000)" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["saleFeePercent", "withdrawalFeePercent", "currency", "minimumWithdrawal"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable security and administrative action audit record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Log entry unique ID" },
+        "adminId": { "type": "string", "description": "Admin Auth UID" },
+        "adminName": { "type": "string", "description": "Admin display name" },
+        "action": { "type": "string", "description": "Action performed" },
+        "targetType": { "type": "string", "description": "Target entity type (user, product, withdrawal, system)" },
+        "targetId": { "type": "string", "description": "Target entity identifier" },
+        "details": { "type": "string", "description": "Serialized JSON action details" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "adminId", "action", "targetType", "targetId", "createdAt"]
     },
     "Notification": {
       "title": "Notification",
@@ -134,6 +229,34 @@
       "schema": { "$ref": "#/entities/UserProfile" },
       "description": "User profiles collection"
     },
+    "/wallets/{userId}": {
+      "schema": { "$ref": "#/entities/Wallet" },
+      "description": "Producer wallet balances (server-authoritative)"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Digital products catalog"
+    },
+    "/sales/{saleId}": {
+      "schema": { "$ref": "#/entities/Sale" },
+      "description": "Sales records with 2% platform commission"
+    },
+    "/withdrawals/{withdrawalId}": {
+      "schema": { "$ref": "#/entities/Withdrawal" },
+      "description": "Withdrawal requests with 6% fee"
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Unified financial ledger transactions"
+    },
+    "/platformSettings/main": {
+      "schema": { "$ref": "#/entities/PlatformSettings" },
+      "description": "Platform financial and commission configuration"
+    },
+    "/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Security and administrative audit trail"
+    },
     "/users/{userId}/notifications/{notificationId}": {
       "schema": { "$ref": "#/entities/Notification" },
       "description": "User in-app notifications subcollection"
@@ -145,14 +268,6 @@
     "/users/{userId}/preferences/notifications": {
       "schema": { "$ref": "#/entities/NotificationPreferences" },
       "description": "User notification channel preferences"
-    },
-    "/products/{productId}": {
-      "schema": { "$ref": "#/entities/Product" },
-      "description": "Digital products collection"
-    },
-    "/orders/{orderId}": {
-      "schema": { "$ref": "#/entities/Order" },
-      "description": "Orders collection"
     },
     "/admin_broadcasts/{broadcastId}": {
       "schema": { "$ref": "#/entities/AdminBroadcast" },

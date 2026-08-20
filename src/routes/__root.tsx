@@ -19,8 +19,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { testFirestoreConnection } from "@/integrations/firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, testFirestoreConnection } from "@/lib/firebase-config";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 function NotFoundComponent() {
@@ -145,12 +145,13 @@ function RootComponent() {
 
   useEffect(() => {
     testFirestoreConnection();
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      if (user) {
+        queryClient.invalidateQueries();
+      }
     });
-    return () => sub.subscription.unsubscribe();
+    return () => unsubscribe();
   }, [router, queryClient]);
 
   return (

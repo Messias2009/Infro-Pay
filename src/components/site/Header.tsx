@@ -3,7 +3,6 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { User as UserIcon, LogOut, ShieldCheck, Lock, Menu, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +16,12 @@ import logoMark from "@/assets/infropay-mark.png";
 export type HeaderVariant = "home" | "loja" | "checkout" | "default";
 
 export function Header({ variant = "default" }: { variant?: HeaderVariant }) {
-  const { user } = useAuth();
+  const { user, signOut: authSignOut } = useAuth();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   async function signOut() {
-    await supabase.auth.signOut();
+    await authSignOut();
     router.navigate({ to: "/" });
   }
 

@@ -1,64 +1,125 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
     // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == "infropayao@gmail.com" ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin")
+      );
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Test connection
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+
     // Users Collection
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow write: if isOwner(userId);
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && (
+        !request.resource.data.keys().hasAny(['role']) ||
+        request.resource.data.role == 'seller' ||
+        request.resource.data.role == 'user' ||
+        isAdmin()
+      );
+      allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'status'])) || isAdmin();
+      allow delete: if isAdmin();
 
       // User notifications subcollection
       match /notifications/{notificationId} {
-        allow read: if isOwner(userId);
-        allow update, delete: if isOwner(userId);
+        allow read: if isOwner(userId) || isAdmin();
+        allow update, delete: if isOwner(userId) || isAdmin();
         allow create: if isAuthenticated();
       }
 
       // User FCM device tokens
       match /fcm_tokens/{tokenId} {
-        allow read, write: if isOwner(userId);
+        allow read, write: if isOwner(userId) || isAdmin();
       }
 
       // User notification preferences
       match /preferences/{prefId} {
-        allow read, write: if isOwner(userId);
+        allow read, write: if isOwner(userId) || isAdmin();
       }
+    }
+
+    // Wallets Collection (Server-Authoritative)
+    match /wallets/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if false; // Only server/backend functions can modify balance & fees
     }
 
     // Products Collection
     match /products/{productId} {
       allow read: if true;
       allow create: if isAuthenticated() && request.resource.data.sellerId == request.auth.uid;
-      allow update, delete: if isAuthenticated() && resource.data.sellerId == request.auth.uid;
+      allow update: if isAuthenticated() && (resource.data.sellerId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && (resource.data.sellerId == request.auth.uid || isAdmin());
     }
 
-    // Orders Collection
-    match /orders/{orderId} {
+    // Sales Collection
+    match /sales/{saleId} {
       allow read: if isAuthenticated() && (
-        resource.data.sellerId == request.auth.uid || 
-        resource.data.customerEmail == request.auth.token.email
+        resource.data.sellerId == request.auth.uid ||
+        resource.data.buyerId == request.auth.uid ||
+        resource.data.buyerEmail == request.auth.token.email ||
+        isAdmin()
       );
-      allow create: if true;
-      allow update, delete: if isAuthenticated() && resource.data.sellerId == request.auth.uid;
+      allow write: if false; // Only server-side webhooks & checkout functions create/update sales
     }
 
-    // Admin Broadcasts Collection
+    // Withdrawals Collection
+    match /withdrawals/{withdrawalId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Transactions Ledger
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+      allow write: if false; // Immutable ledger
+    }
+
+    // Platform Settings
+    match /platformSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Audit Logs
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false; // Immutable audit log written by server
+    }
+
+    // Admin Broadcasts
     match /admin_broadcasts/{broadcastId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
-    }
-
-    // Test connection doc
-    match /test/{docId} {
-      allow read, write: if true;
+      allow write: if isAdmin();
     }
   }
 }

@@ -11,8 +11,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +31,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const router = useRouter();
   const searchParams = Route.useSearch();
+  const { signInWithEmail, signUpWithEmail, signInWithGoogle, resetPassword } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">(searchParams.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,23 +51,11 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth`,
-            data: { full_name: name.trim() },
-          },
-        });
-        if (error) throw error;
-        toast.success("Conta criada com sucesso!");
+        await signUpWithEmail(email.trim(), password, name.trim());
+        toast.success("Conta criada e perfil sincronizado com sucesso!");
         router.navigate({ to: "/produtor" });
       } else if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-        if (error) throw error;
+        await signInWithEmail(email.trim(), password);
         toast.success("Bem-vindo de volta!");
         router.navigate({ to: "/produtor" });
       } else if (mode === "forgot") {
@@ -77,10 +65,7 @@ function AuthPage() {
         }
 
         try {
-          const redirectTo = `${window.location.origin}/redefinir-senha`;
-          await supabase.auth.resetPasswordForEmail(email.trim(), {
-            redirectTo,
-          });
+          await resetPassword(email.trim());
         } catch (recoveryErr) {
           console.warn("Informação de recuperação de senha:", recoveryErr);
         }
@@ -89,8 +74,20 @@ function AuthPage() {
         setForgotSent(true);
         toast.success("Pedido de recuperação processado.");
       }
-    } catch (err) {
-      toast.error((err as Error).message);
+    } catch (err: any) {
+      let msg = err?.message || "Ocorreu um erro na autenticação.";
+      if (
+        msg.includes("auth/invalid-credential") ||
+        msg.includes("auth/wrong-password") ||
+        msg.includes("auth/user-not-found")
+      ) {
+        msg = "Credenciais inválidas. Verifique o seu e-mail e senha.";
+      } else if (msg.includes("auth/email-already-in-use")) {
+        msg = "Este e-mail já se encontra registado. Tente iniciar sessão.";
+      } else if (msg.includes("auth/weak-password")) {
+        msg = "A palavra-passe deve ter pelo menos 6 caracteres.";
+      }
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -99,16 +96,13 @@ function AuthPage() {
   async function handleGoogle() {
     setLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-      if (result.redirected) return;
-      toast.success("Bem-vindo!");
+      await signInWithGoogle();
+      toast.success("Bem-vindo à Infropai!");
       router.navigate({ to: "/produtor" });
+    } catch (err: any) {
+      if (err?.code !== "auth/popup-closed-by-user") {
+        toast.error(err?.message || "Falha na autenticação com Google.");
+      }
     } finally {
       setLoading(false);
     }

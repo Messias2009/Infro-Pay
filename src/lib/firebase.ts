@@ -1,1 +1,1 @@
-export * from "@/integrations/firebase/config";
+export * from "./firebase-config";

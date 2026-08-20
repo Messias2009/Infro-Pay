@@ -3,8 +3,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { dispatchNotification } from "./notifications.server";
 
-export const MIN_WITHDRAWAL_CENTS = 500_000; // 5.000 Kz
-export const WITHDRAWAL_FEE = 0.08;
+export const MIN_WITHDRAWAL_CENTS = 500_000; // 5.000 Kz (in cents)
+export const WITHDRAWAL_FEE_PERCENT = 6; // 6%
+export const WITHDRAWAL_FEE = 0.06; // 6% decimal
+export const SALE_FEE_PERCENT = 2; // 2%
+export const SALE_FEE = 0.02; // 2% decimal
 
 async function assertAdmin(supabase: any, userId: string) {
   const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
@@ -78,26 +81,48 @@ export const deleteBankAccount = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// ---------------- Withdrawals ----------------
+// ---------------- Withdrawals with 6% fee & Idempotency ----------------
 export const requestWithdrawal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: any) =>
     z
       .object({
-        gross_cents: z.number().int().min(MIN_WITHDRAWAL_CENTS),
+        gross_cents: z
+          .number()
+          .int()
+          .min(MIN_WITHDRAWAL_CENTS, "O valor mínimo de saque é 5.000 Kz"),
         bank_account_id: z.string().uuid(),
+        idempotency_key: z.string().optional(),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
+    const feeCents = Math.round(data.gross_cents * WITHDRAWAL_FEE);
+    const netCents = data.gross_cents - feeCents;
+
+    // Check existing pending withdrawal with same idempotency key if provided
+    if (data.idempotency_key) {
+      const { data: existing } = await (context.supabase as any)
+        .from("withdrawals")
+        .select("*")
+        .eq("producer_id", context.userId)
+        .eq("idempotency_key", data.idempotency_key)
+        .maybeSingle();
+      if (existing) {
+        return existing;
+      }
+    }
+
     const { error, data: row } = await (context.supabase as any)
       .from("withdrawals")
       .insert({
         producer_id: context.userId,
         bank_account_id: data.bank_account_id,
         gross_cents: data.gross_cents,
-        fee_cents: 0,
-        net_cents: 0,
+        fee_cents: feeCents,
+        net_cents: netCents,
+        idempotency_key: data.idempotency_key ?? crypto.randomUUID(),
+        status: "em_analise",
       })
       .select()
       .maybeSingle();
@@ -109,8 +134,13 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
         userId: context.userId,
         type: "withdrawal_requested",
         title: "📤 Solicitação de Saque Recebida",
-        message: `O seu pedido de levantamento de ${(data.gross_cents / 100).toLocaleString("pt-AO")} Kz foi submetido para análise.`,
-        data: { amountCents: data.gross_cents },
+        message: `O seu pedido de levantamento de ${(data.gross_cents / 100).toLocaleString("pt-AO")} Kz (Líquido: ${(netCents / 100).toLocaleString("pt-AO")} Kz após 6% de taxa) foi submetido para análise.`,
+        data: {
+          amountCents: data.gross_cents,
+          feeCents,
+          netCents,
+          feePercent: WITHDRAWAL_FEE_PERCENT,
+        },
         relatedId: row?.id,
         relatedType: "withdrawal",
         link: "/produtor/saques",
@@ -199,13 +229,16 @@ export const updateWithdrawalStatus = createServerFn({ method: "POST" })
               ? "⏳ Saque em Análise Bancária"
               : "⚠️ Saque Recusado";
 
-        const formatted = (currentW.gross_cents / 100).toLocaleString("pt-AO") + " Kz";
+        const netFormatted =
+          (
+            (currentW.net_cents || currentW.gross_cents * (1 - WITHDRAWAL_FEE)) / 100
+          ).toLocaleString("pt-AO") + " Kz";
         const message =
           data.status === "aprovado" || data.status === "pago"
-            ? `O seu levantamento de ${formatted} foi processado e creditado com sucesso.`
+            ? `O seu levantamento líquido de ${netFormatted} foi processado e creditado com sucesso.`
             : data.status === "em_analise"
-              ? `O seu levantamento de ${formatted} está a ser analisado pela equipa financeira.`
-              : `O seu pedido de levantamento de ${formatted} foi recusado.${data.rejection_reason ? ` Motivo: ${data.rejection_reason}` : ""}`;
+              ? `O seu levantamento de ${netFormatted} está a ser analisado pela equipa financeira.`
+              : `O seu pedido de levantamento foi recusado.${data.rejection_reason ? ` Motivo: ${data.rejection_reason}` : ""}`;
 
         await dispatchNotification({
           userId: currentW.producer_id,
@@ -214,6 +247,9 @@ export const updateWithdrawalStatus = createServerFn({ method: "POST" })
           message,
           data: {
             amountCents: currentW.gross_cents,
+            netCents: currentW.net_cents,
+            feeCents: currentW.fee_cents,
+            feePercent: WITHDRAWAL_FEE_PERCENT,
             bankName: currentW.bank_account?.bank_name,
             iban: currentW.bank_account?.iban,
             reason: data.rejection_reason,
