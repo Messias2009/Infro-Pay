@@ -12,7 +12,6 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  Sparkles,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -349,7 +348,7 @@ function Page() {
                     onClick={() => handleTogglePush(true)}
                     className="mt-2.5 h-8 text-xs font-semibold border-gold/40 text-gold hover:bg-gold/10"
                   >
-                    <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                    <Bell className="h-3.5 w-3.5 mr-1.5" />
                     {pushLoading ? "A solicitar permissão..." : "Permitir Push neste Navegador"}
                   </Button>
                 )}

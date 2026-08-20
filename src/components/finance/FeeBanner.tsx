@@ -1,4 +1,4 @@
-import { ShieldCheck, Info, Sparkles, ArrowDownToLine } from "lucide-react";
+import { ShieldCheck, Info, TrendingUp, ArrowDownToLine } from "lucide-react";
 
 export function FeeBanner({
   variant = "default",
@@ -71,7 +71,7 @@ export function FeeBanner({
       >
         <div className="flex items-start gap-4">
           <div className="h-11 w-11 rounded-xl bg-primary/20 text-primary-glow grid place-items-center shrink-0 border border-primary/30">
-            <Sparkles className="h-5 w-5" />
+            <TrendingUp className="h-5 w-5" />
           </div>
           <div className="space-y-1.5 flex-1">
             <div className="flex items-center gap-2">

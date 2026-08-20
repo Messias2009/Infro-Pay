@@ -4,7 +4,7 @@ import { z } from "zod";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCard } from "@/components/site/ProductCard";
 import { listCategories, listPublishedProducts } from "@/lib/catalog.functions";
-import { Sparkles } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 const search = z.object({ cat: z.string().optional() });
 
@@ -79,7 +79,7 @@ function Loja() {
 
         {products.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-card/40 p-16 text-center">
-            <Sparkles className="h-10 w-10 text-gold mx-auto mb-3" />
+            <ShoppingBag className="h-10 w-10 text-muted-foreground/60 mx-auto mb-3" />
             <h3 className="font-display text-xl font-semibold">Sem produtos nesta categoria.</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Volte em breve ou explore outras categorias.

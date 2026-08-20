@@ -12,7 +12,7 @@ import {
   Info,
   ShieldAlert,
   Clock,
-  Sparkles,
+  Zap,
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -114,7 +114,7 @@ function getNotificationVisuals(type: string, title: string) {
 
   if (lower.includes("atualização") || lower.includes("update") || lower.includes("novidade")) {
     return {
-      icon: Sparkles,
+      icon: Zap,
       color: "text-blue-400",
       bg: "bg-blue-400/15 border-blue-400/30",
       badge: "Novidade",

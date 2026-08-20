@@ -10,7 +10,6 @@ import {
   Building2,
   Zap,
   CheckCircle2,
-  Sparkles,
   Gift,
   BadgeCheck,
 } from "lucide-react";
@@ -404,7 +403,7 @@ function Checkout() {
                   }`}
                 >
                   <div className="absolute top-0 right-0 rounded-bl-xl bg-gold px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gold-foreground flex items-center gap-1 shadow-sm">
-                    <Sparkles className="h-3 w-3" /> Oferta Especial
+                    <Gift className="h-3 w-3" /> Oferta Especial
                   </div>
 
                   <div className="flex items-start gap-3.5 sm:gap-4 pt-1">

@@ -6,7 +6,7 @@ import {
   Download,
   ExternalLink,
   Copy,
-  Sparkles,
+  Gift,
   ShieldCheck,
   BookOpen,
   ArrowRight,
@@ -220,7 +220,7 @@ function Pedido() {
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <span className="text-xs font-bold uppercase tracking-widest text-gold flex items-center gap-1">
-                    <Sparkles className="h-3.5 w-3.5" /> Oferta Especial Incluída
+                    <Gift className="h-3.5 w-3.5" /> Oferta Especial Incluída
                   </span>
                   {paid && (
                     <span className="rounded-full bg-success/10 text-success text-[10px] font-bold px-2 py-0.5 border border-success/20">

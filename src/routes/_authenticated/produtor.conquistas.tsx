@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Trophy, Lock, Flame, Rocket, Crown, Star, Medal, Sparkles, Eye } from "lucide-react";
+import { Trophy, Lock, Flame, Rocket, Crown, Star, Medal, Award, Eye } from "lucide-react";
 import { getMyAchievements } from "@/lib/profile.functions";
 import { LEVELS, levelFor, type Level } from "@/lib/legends.functions";
 import { kz } from "@/components/finance/FeeBanner";
@@ -51,7 +51,7 @@ function Page() {
         <div className="grid lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-4">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/10 text-gold text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="h-3.5 w-3.5" /> Nível Atual Conquistado
+              <Award className="h-3.5 w-3.5" /> Nível Atual Conquistado
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
               Placa Oficial <span style={{ color: current.color }}>{current.name}</span>

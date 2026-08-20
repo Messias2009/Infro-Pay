@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Award, Shield, CheckCircle2, Download, Share2, Sparkles } from "lucide-react";
+import { Award, Shield, CheckCircle2, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Level, LEVELS } from "@/lib/legends.functions";
 import logoMark from "@/assets/infropay-mark.png";
@@ -226,7 +226,7 @@ export function AwardPlaque({
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-muted-foreground">
-              <Sparkles className="h-3 w-3" style={{ color: theme.primary }} />
+              <Shield className="h-3 w-3" style={{ color: theme.primary }} />
               <span>Official Award</span>
             </div>
           </div>

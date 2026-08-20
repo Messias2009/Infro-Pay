@@ -7,7 +7,6 @@ import {
   Package,
   Banknote,
   ArrowUpRight,
-  Sparkles,
   Users,
   BarChart3,
   ScrollText,
@@ -74,7 +73,7 @@ function AdmLayout() {
             onClick={claim}
             className="mt-6 gradient-brand text-primary-foreground shadow-glow"
           >
-            <Sparkles className="h-4 w-4 mr-1" /> Tornar-me administrador
+            <ShieldCheck className="h-4 w-4 mr-1" /> Tornar-me administrador
           </Button>
           <Link
             to="/produtor"

@@ -108,13 +108,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         property: "og:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/dc44a9ae-646e-4098-8754-70086d332e5c",
+        content: "/infropay-logo.svg",
       },
       {
         name: "twitter:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/dc44a9ae-646e-4098-8754-70086d332e5c",
+        content: "/infropay-logo.svg",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],

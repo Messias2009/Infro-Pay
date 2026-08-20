@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Bell,
   Send,
-  Sparkles,
+  Zap,
   Users,
   Smartphone,
   Mail,
@@ -359,7 +359,7 @@ function AdmNotificacoesPage() {
           {/* Quick Simulation Box */}
           <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
             <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-gold" /> Teste de Notificações em Tempo Real
+              <Zap className="h-4 w-4 text-gold" /> Teste de Notificações em Tempo Real
             </h3>
             <p className="text-xs text-muted-foreground">
               Dispare notificações de teste para a sua conta e valide a entrega interna, push e
