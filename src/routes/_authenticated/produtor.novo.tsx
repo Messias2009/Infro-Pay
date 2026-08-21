@@ -22,7 +22,7 @@ import {
   deliveryPayload,
   type DeliveryValues,
 } from "@/components/products/DeliveryFields";
-import { createProduct } from "@/lib/products.functions";
+import { saveProductToFirestore } from "@/lib/products.service";
 import { listCategories } from "@/lib/catalog.functions";
 
 export const Route = createFileRoute("/_authenticated/produtor/novo")({
@@ -57,7 +57,6 @@ function slugify(s: string) {
 function NovoProduto() {
   const router = useRouter();
   const catsFn = useServerFn(listCategories);
-  const createFn = useServerFn(createProduct);
   const { data: cats } = useQuery({ queryKey: ["categories"], queryFn: () => catsFn() });
 
   const [form, setForm] = useState({
@@ -74,7 +73,7 @@ function NovoProduto() {
     price: "",
     promo_price: "",
     currency: "AOA",
-    submit_for_review: false,
+    submit_for_review: true,
     tags: "",
     guarantee_days: 7,
   });
@@ -113,13 +112,14 @@ function NovoProduto() {
         guarantee_days: Number(form.guarantee_days),
         ...deliveryPayload(delivery),
       };
-      const row = await createFn({ data: payload });
+
+      const saved = await saveProductToFirestore(payload);
       toast.success(
-        row.status === "publicado"
+        saved.status === "publicado"
           ? "Produto publicado com sucesso!"
           : "Produto guardado como rascunho!",
       );
-      router.navigate({ to: "/produtor/sucesso/$id", params: { id: row.id } });
+      router.navigate({ to: "/produtor/sucesso/$id", params: { id: saved.id } });
     } catch (err) {
       toast.error((err as Error).message);
     } finally {

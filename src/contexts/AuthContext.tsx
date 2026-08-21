@@ -15,6 +15,8 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, firestore, handleFirestoreError, OperationType } from "@/lib/firebase-config";
 import type { AuthContextType, UserProfile, UserRole } from "@/types/auth";
 
+export const ADMIN_UID = "rsKuyZLn7gbRulIKz5WpxpgqJDo2";
+
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -27,7 +29,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const userRef = doc(firestore, "users", firebaseUser.uid);
       const userSnap = await getDoc(userRef);
-      const isAdminEmail = firebaseUser.email?.toLowerCase() === "infropayao@gmail.com";
+      const isSpecialAdmin =
+        firebaseUser.uid === ADMIN_UID ||
+        firebaseUser.email?.toLowerCase() === "infropayao@gmail.com";
       const now = new Date().toISOString();
 
       if (!userSnap.exists()) {
@@ -41,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: firebaseUser.email || "",
           photoURL: firebaseUser.photoURL || null,
           avatar_url: firebaseUser.photoURL || null,
-          role: (isAdminEmail ? "admin" : "seller") as UserRole,
+          role: (isSpecialAdmin ? "admin" : "seller") as UserRole,
           status: "active",
           createdAt: now,
           updatedAt: now,
@@ -65,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         // Subsequent login: Load existing profile and update lastLoginAt
         const existingData = userSnap.data() as Partial<UserProfile>;
-        const mergedRole: UserRole = existingData.role || (isAdminEmail ? "admin" : "seller");
+        const mergedRole: UserRole = isSpecialAdmin ? "admin" : existingData.role || "seller";
 
         const loadedProfile: UserProfile = {
           uid: firebaseUser.uid,
@@ -193,10 +197,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [refreshProfile]);
 
-  const role: UserRole | null =
-    profile?.role ??
-    (user?.email?.toLowerCase() === "infropayao@gmail.com" ? "admin" : user ? "seller" : null);
-  const isAdmin = role === "admin" || user?.email?.toLowerCase() === "infropayao@gmail.com";
+  const isExplicitAdmin =
+    user?.uid === ADMIN_UID ||
+    user?.email?.toLowerCase() === "infropayao@gmail.com" ||
+    profile?.role === "admin";
+  const role: UserRole | null = isExplicitAdmin
+    ? "admin"
+    : profile?.role ?? (user ? "seller" : null);
+  const isAdmin = isExplicitAdmin;
   const isSeller = role === "seller" || role === "admin";
 
   const value: AuthContextType = {

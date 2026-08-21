@@ -13,7 +13,7 @@ export function FeeBanner({
       >
         <ShieldCheck className="h-4 w-4 text-gold shrink-0" />
         <span className="text-muted-foreground">
-          Taxas Infropai: <b className="text-foreground">2%</b> por venda ·{" "}
+          Taxas InfroPay: <b className="text-foreground">2%</b> por venda ·{" "}
           <b className="text-foreground">6%</b> por saque · Saque mínimo{" "}
           <b className="text-foreground">5.000 Kz</b>
         </span>
@@ -41,7 +41,7 @@ export function FeeBanner({
               Saque com Transparência Total
             </div>
             <p className="text-sm text-muted-foreground">
-              A Infropai aplica uma taxa fixa e transparente de{" "}
+              A InfroPay aplica uma taxa fixa e transparente de{" "}
               <b className="text-foreground">6%</b> em cada levantamento. Antes de confirmar o seu
               saque, você visualiza em tempo real:{" "}
               <b className="text-foreground">Valor solicitado</b>,{" "}
@@ -80,7 +80,7 @@ export function FeeBanner({
               </span>
             </div>
             <div className="font-display font-semibold text-lg text-foreground">
-              Vendeu? A Infropai cobra apenas 2% por venda
+              Vendeu? A InfroPay cobra apenas 2% por venda
             </div>
             <p className="text-sm text-muted-foreground">
               Fique com <b className="text-foreground">98% do valor líquido</b> dos seus produtos
@@ -104,7 +104,7 @@ export function FeeBanner({
         <div className="space-y-1.5 flex-1">
           <div className="font-display font-semibold text-lg">Transparência total em taxas</div>
           <p className="text-sm text-muted-foreground">
-            A Infropai opera com as menores taxas do mercado: apenas{" "}
+            A InfroPay opera com as menores taxas do mercado: apenas{" "}
             <b className="text-foreground">2% por cada venda</b> concluída e{" "}
             <b className="text-foreground">6% em cada saque</b>. Sem mensalidades ou custos ocultos.
             Saque mínimo de <b className="text-foreground">5.000 Kz</b> ·{" "}
@@ -123,9 +123,9 @@ export function FeeBanner({
 
 export function kz(cents: number | null | undefined) {
   const v = (cents ?? 0) / 100;
-  return new Intl.NumberFormat("pt-AO", {
-    style: "currency",
-    currency: "AOA",
-    maximumFractionDigits: 0,
+  const formatted = new Intl.NumberFormat("pt-AO", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(v);
+  return `${formatted} AOA`;
 }

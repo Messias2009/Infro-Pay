@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
-import { Upload, X, Loader2, ImageIcon, FileText } from "lucide-react";
+import { X, Loader2, ImageIcon, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { uploadFileToStorage } from "@/lib/storage.service";
+import { auth } from "@/lib/firebase-config";
 
 type Props = {
   value: string | null | undefined;
@@ -13,8 +14,6 @@ type Props = {
   accept?: string;
   productKey?: string; // e.g. product id or slug for folder grouping
 };
-
-const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
 
 export function MediaUpload({
   value,
@@ -39,30 +38,21 @@ export function MediaUpload({
       return;
     }
     setUploading(true);
-    setProgress(10);
+    setProgress(5);
     try {
-      const { data: sess } = await supabase.auth.getUser();
-      const uid = sess.user?.id;
-      if (!uid) throw new Error("Sessão expirada");
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "bin";
-      const path = `${uid}/${productKey ?? "misc"}/${kind}-${Date.now()}.${ext}`;
-      setProgress(30);
-      const { error: upErr } = await supabase.storage.from("product-media").upload(path, file, {
-        upsert: true,
-        cacheControl: "3600",
-        contentType: file.type || undefined,
+      const uid = auth.currentUser?.uid;
+      const folder = productKey ? `products/${productKey}` : kind === "image" ? "images" : "files";
+
+      const res = await uploadFileToStorage(file, {
+        folder: uid ? `users/${uid}/${folder}` : `public/${folder}`,
+        onProgress: (pct) => setProgress(pct),
       });
-      if (upErr) throw upErr;
-      setProgress(70);
-      const { data: signed, error: sErr } = await supabase.storage
-        .from("product-media")
-        .createSignedUrl(path, TEN_YEARS);
-      if (sErr) throw sErr;
-      setProgress(100);
-      onChange(signed.signedUrl);
-      toast.success("Upload concluído");
+
+      onChange(res.downloadUrl);
+      toast.success("Upload concluído com sucesso");
     } catch (err) {
-      toast.error((err as Error).message || "Falha no upload");
+      console.error("Upload error:", err);
+      toast.error((err as Error).message || "Falha no envio do ficheiro");
     } finally {
       setUploading(false);
       setTimeout(() => setProgress(0), 400);

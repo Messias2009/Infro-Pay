@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { listAllProductsAdmin } from "@/lib/admin.functions";
+import { getAllAdminProducts } from "@/lib/products.service";
 
 export const Route = createFileRoute("/_authenticated/adm/produtos")({
   component: TodosProdutos,
@@ -23,8 +22,10 @@ const BADGE: Record<string, string> = {
 };
 
 function TodosProdutos() {
-  const fn = useServerFn(listAllProductsAdmin);
-  const { data } = useQuery({ queryKey: ["admin", "all-products"], queryFn: () => fn() });
+  const { data } = useQuery({
+    queryKey: ["admin", "all-products"],
+    queryFn: () => getAllAdminProducts(),
+  });
 
   return (
     <div className="p-6 md:p-10 max-w-6xl">

@@ -12,9 +12,9 @@ export function SiteLayout({
   variant?: SiteLayoutVariant;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col w-full max-w-full overflow-x-clip">
       <Header variant={variant as HeaderVariant} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 w-full max-w-full">{children}</main>
       <Footer variant={variant as FooterVariant} />
     </div>
   );

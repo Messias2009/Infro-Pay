@@ -97,7 +97,7 @@ function AuthPage() {
     setLoading(true);
     try {
       await signInWithGoogle();
-      toast.success("Bem-vindo à Infropai!");
+      toast.success("Bem-vindo à InfroPay!");
       router.navigate({ to: "/produtor" });
     } catch (err: any) {
       if (err?.code !== "auth/popup-closed-by-user") {

@@ -19,7 +19,7 @@ import { RevenueChart } from "@/components/finance/RevenueChart";
 
 export const Route = createFileRoute("/_authenticated/produtor/financeiro")({
   head: () => ({
-    meta: [{ title: "Financeiro & Carteira — Infropai" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Financeiro & Carteira — InfroPay" }, { name: "robots", content: "noindex" }],
   }),
   component: Page,
 });

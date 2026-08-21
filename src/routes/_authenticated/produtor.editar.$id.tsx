@@ -36,11 +36,11 @@ import {
   type DeliveryValues,
 } from "@/components/products/DeliveryFields";
 import {
-  getMyProduct,
-  updateProduct,
-  deleteProduct,
-  submitProductForApproval,
-} from "@/lib/products.functions";
+  getProductById,
+  updateProductInFirestore,
+  deleteProductFromFirestore,
+  type UnifiedProduct,
+} from "@/lib/products.service";
 import { listCategories } from "@/lib/catalog.functions";
 
 export const Route = createFileRoute("/_authenticated/produtor/editar/$id")({
@@ -72,16 +72,15 @@ const STATUS_LABEL: Record<string, string> = {
 function EditarProduto() {
   const { id } = Route.useParams();
   const router = useRouter();
-  const getFn = useServerFn(getMyProduct);
-  const updateFn = useServerFn(updateProduct);
-  const deleteFn = useServerFn(deleteProduct);
-  const submitFn = useServerFn(submitProductForApproval);
   const catsFn = useServerFn(listCategories);
   const {
     data: product,
     isLoading,
     refetch,
-  } = useQuery({ queryKey: ["my-product", id], queryFn: () => getFn({ data: { id } }) });
+  } = useQuery({
+    queryKey: ["my-product", id],
+    queryFn: () => getProductById(id),
+  });
   const { data: cats } = useQuery({ queryKey: ["categories"], queryFn: () => catsFn() });
 
   const [form, setForm] = useState<any>(null);
@@ -101,7 +100,7 @@ function EditarProduto() {
         banner_url: product.banner_url ?? "",
         file_url: product.file_url ?? "",
         external_url: product.external_url ?? "",
-        price: (product.price_cents / 100).toString(),
+        price: ((product.price_cents || 0) / 100).toString(),
         promo_price: product.promo_price_cents ? (product.promo_price_cents / 100).toString() : "",
         currency: product.currency,
         tags: (product.tags ?? []).join(", "),
@@ -110,7 +109,7 @@ function EditarProduto() {
         affiliate_commission_percent: Number((product as any).affiliate_commission_percent ?? 30),
         status: product.status,
       });
-      setDelivery(deliveryFromRow(product));
+      setDelivery(deliveryFromRow(product as any));
     }
   }, [product]);
 
@@ -124,35 +123,30 @@ function EditarProduto() {
     e.preventDefault();
     setSaving(true);
     try {
-      await updateFn({
-        data: {
-          id,
-          patch: {
-            title: form.title.trim(),
-            slug: form.slug,
-            short_description: form.short_description || null,
-            description: form.description || null,
-            product_type: form.product_type,
-            category_id: form.category_id || null,
-            cover_url: form.cover_url || null,
-            banner_url: form.banner_url || null,
-            file_url: form.file_url || null,
-            external_url: form.external_url || null,
-            price_cents: Math.round(Number(form.price || "0") * 100),
-            promo_price_cents: form.promo_price ? Math.round(Number(form.promo_price) * 100) : null,
-            currency: form.currency.toUpperCase(),
-            tags: form.tags
-              ? form.tags
-                  .split(",")
-                  .map((t: string) => t.trim())
-                  .filter(Boolean)
-              : [],
-            guarantee_days: Number(form.guarantee_days),
-            allow_affiliates: !!form.allow_affiliates,
-            affiliate_commission_percent: Number(form.affiliate_commission_percent || 0),
-            ...deliveryPayload(delivery),
-          },
-        },
+      await updateProductInFirestore(id, {
+        title: form.title.trim(),
+        slug: form.slug,
+        short_description: form.short_description || null,
+        description: form.description || null,
+        product_type: form.product_type,
+        category_id: form.category_id || null,
+        cover_url: form.cover_url || null,
+        banner_url: form.banner_url || null,
+        file_url: form.file_url || null,
+        external_url: form.external_url || null,
+        price_cents: Math.round(Number(form.price || "0") * 100),
+        promo_price_cents: form.promo_price ? Math.round(Number(form.promo_price) * 100) : null,
+        currency: form.currency.toUpperCase(),
+        tags: form.tags
+          ? form.tags
+              .split(",")
+              .map((t: string) => t.trim())
+              .filter(Boolean)
+          : [],
+        guarantee_days: Number(form.guarantee_days),
+        allow_affiliates: !!form.allow_affiliates,
+        affiliate_commission_percent: Number(form.affiliate_commission_percent || 0),
+        ...deliveryPayload(delivery),
       });
       toast.success("Alterações guardadas");
       refetch();
@@ -165,8 +159,8 @@ function EditarProduto() {
 
   async function submitForApproval() {
     try {
-      await submitFn({ data: { id } });
-      toast.success("Enviado para aprovação!");
+      await updateProductInFirestore(id, { status: "publicado", rejection_reason: null });
+      toast.success("Produto publicado com sucesso!");
       refetch();
     } catch (err) {
       toast.error((err as Error).message);
@@ -175,7 +169,7 @@ function EditarProduto() {
 
   async function remove() {
     try {
-      await deleteFn({ data: { id } });
+      await deleteProductFromFirestore(id);
       toast.success("Produto eliminado");
       router.navigate({ to: "/produtor/produtos" });
     } catch (err) {

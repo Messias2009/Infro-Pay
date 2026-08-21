@@ -92,17 +92,17 @@ function Produto() {
           currency: p.currency,
         }}
       />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+      <div className="mx-auto w-full max-w-7xl px-3.5 sm:px-6 py-6 sm:py-8">
         <Link
           to="/loja"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-6"
         >
-          <ArrowLeft className="h-4 w-4 mr-1" /> Voltar à loja
+          <ArrowLeft className="h-4 w-4 mr-1.5 shrink-0" /> Voltar à loja
         </Link>
 
-        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-10">
-          <div>
-            <div className="aspect-video rounded-2xl overflow-hidden border border-border bg-gradient-to-br from-primary/20 to-gold/10">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-10 w-full items-start">
+          <div className="w-full min-w-0">
+            <div className="aspect-video w-full rounded-2xl overflow-hidden border border-border bg-gradient-to-br from-primary/20 to-gold/10">
               {p.cover_url ? (
                 <img src={p.cover_url} alt={p.title} className="h-full w-full object-cover" />
               ) : (
@@ -112,24 +112,28 @@ function Produto() {
               )}
             </div>
 
-            <div className="mt-8">
+            <div className="mt-6 sm:mt-8 w-full">
               {p.category && (
-                <div className="inline-block rounded-full glass px-3 py-1 text-xs font-medium mb-3">
+                <div className="inline-block rounded-full glass px-3 py-1 text-xs font-semibold mb-3">
                   {(p.category as any).name}
                 </div>
               )}
-              <h1 className="text-3xl md:text-5xl font-bold tracking-tight">{p.title}</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-foreground break-words">
+                {p.title}
+              </h1>
               {p.short_description && (
-                <p className="mt-4 text-lg text-muted-foreground">{p.short_description}</p>
+                <p className="mt-3 sm:mt-4 text-base sm:text-lg text-muted-foreground leading-relaxed">
+                  {p.short_description}
+                </p>
               )}
 
               {p.description && (
-                <div className="mt-10 prose prose-invert max-w-none whitespace-pre-wrap text-foreground/90">
+                <div className="mt-8 sm:mt-10 prose prose-invert max-w-none whitespace-pre-wrap text-foreground/90 leading-relaxed text-sm sm:text-base break-words">
                   {p.description}
                 </div>
               )}
 
-              <div className="mt-12 grid sm:grid-cols-3 gap-4">
+              <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full">
                 <Benefit
                   icon={ShieldCheck}
                   title="Garantia"
@@ -141,8 +145,8 @@ function Produto() {
             </div>
           </div>
 
-          <aside className="lg:sticky lg:top-24 h-fit">
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+          <aside className="lg:sticky lg:top-24 h-fit w-full">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card w-full overflow-hidden">
               {hasPromo ? (
                 <>
                   <div className="text-sm text-muted-foreground line-through">

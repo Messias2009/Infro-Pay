@@ -10,6 +10,8 @@ import {
   HelpCircle,
   ArrowLeft,
   CheckCircle2,
+  Instagram,
+  ExternalLink,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
@@ -93,6 +95,63 @@ function Contactos() {
               </h2>
 
               <div className="space-y-3">
+                {/* WhatsApp */}
+                <a
+                  href="https://wa.me/244932415854"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-3.5 p-3.5 rounded-xl bg-background/60 border border-border/60 hover:border-[#25D366]/60 transition group"
+                >
+                  <div className="h-10 w-10 rounded-lg bg-[#25D366] text-white grid place-items-center shrink-0 shadow-sm">
+                    <MessageCircle className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-xs uppercase font-semibold text-muted-foreground">
+                        WhatsApp Oficial
+                      </span>
+                      <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#25D366] group-hover:underline">
+                        Conversar <ExternalLink className="h-3 w-3" />
+                      </span>
+                    </div>
+                    <div className="font-bold text-sm sm:text-base text-foreground group-hover:text-[#25D366] transition truncate">
+                      +244 932 415 854
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      Atendimento rápido e suporte a criadores
+                    </div>
+                  </div>
+                </a>
+
+                {/* Instagram */}
+                <a
+                  href="https://instagram.com/infropay.ao"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-3.5 p-3.5 rounded-xl bg-background/60 border border-border/60 hover:border-[#E1306C]/60 transition group"
+                >
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white grid place-items-center shrink-0 shadow-sm">
+                    <Instagram className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-xs uppercase font-semibold text-muted-foreground">
+                        Instagram Oficial
+                      </span>
+                      <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#E1306C] group-hover:underline">
+                        Seguir <ExternalLink className="h-3 w-3" />
+                      </span>
+                    </div>
+                    <div className="font-bold text-sm sm:text-base text-foreground group-hover:text-gold transition truncate">
+                      @infropay.ao
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      Novidades, dicas e atualizações da plataforma
+                    </div>
+                  </div>
+                </a>
+
+                {/* Email */}
                 <a
                   href="mailto:suporte@infropay.ao"
                   className="flex items-start gap-3.5 p-3.5 rounded-xl bg-background/60 border border-border/60 hover:border-gold/50 transition group"
@@ -100,7 +159,7 @@ function Contactos() {
                   <div className="h-10 w-10 rounded-lg gradient-brand grid place-items-center shrink-0 text-primary-foreground">
                     <Mail className="h-5 w-5" />
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="text-xs uppercase font-semibold text-muted-foreground">
                       Email de Suporte
                     </div>
@@ -113,28 +172,7 @@ function Contactos() {
                   </div>
                 </a>
 
-                <a
-                  href="https://wa.me/244900000000"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-3.5 p-3.5 rounded-xl bg-background/60 border border-border/60 hover:border-success/50 transition group"
-                >
-                  <div className="h-10 w-10 rounded-lg bg-success text-white grid place-items-center shrink-0">
-                    <MessageCircle className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs uppercase font-semibold text-muted-foreground">
-                      WhatsApp Produtores
-                    </div>
-                    <div className="font-bold text-sm text-foreground group-hover:text-success transition truncate">
-                      +244 900 000 000
-                    </div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      Atendimento rápido para criadores
-                    </div>
-                  </div>
-                </a>
-
+                {/* Sede */}
                 <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-background/60 border border-border/60">
                   <div className="h-10 w-10 rounded-lg bg-primary/20 text-primary grid place-items-center shrink-0">
                     <MapPin className="h-5 w-5" />

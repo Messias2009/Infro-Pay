@@ -20,7 +20,8 @@ import {
   Handshake,
 } from "lucide-react";
 import logoMark from "@/assets/infropay-mark.png";
-import { isAdmin } from "@/lib/admin.functions";
+import { isAdmin as isAdminFn } from "@/lib/admin.functions";
+import { useAuth } from "@/hooks/useAuth";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 
@@ -79,15 +80,16 @@ function NavBody({
 
         {admin && (
           <>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground px-3 pt-6 pb-2">
+            <div className="text-[10px] uppercase tracking-widest text-gold px-3 pt-6 pb-2 font-bold flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5" />
               Administração
             </div>
             <Link
-              to="/adm"
+              to="/adm/usuarios"
               onClick={onNav}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${pathname.startsWith("/adm") ? "bg-gold/15 text-gold" : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"}`}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${pathname.startsWith("/adm") ? "bg-gold/15 text-gold font-medium" : "text-muted-foreground hover:bg-accent/40 hover:text-foreground"}`}
             >
-              <Shield className="h-4 w-4" /> Painel admin
+              <Shield className="h-4 w-4 text-gold" /> Painel Admin Geral
             </Link>
           </>
         )}
@@ -114,13 +116,20 @@ function NavBody({
 
 function ProdutorLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isAdminFn = useServerFn(isAdmin);
-  const { data: admin } = useQuery({
+  const { user, isAdmin: authIsAdmin } = useAuth();
+  const adminServerFn = useServerFn(isAdminFn);
+  const { data: serverAdmin } = useQuery({
     queryKey: ["is-admin"],
-    queryFn: () => isAdminFn(),
+    queryFn: () => adminServerFn(),
     staleTime: 60_000,
   });
   const [open, setOpen] = useState(false);
+
+  const isUserAdmin =
+    authIsAdmin ||
+    user?.uid === "rsKuyZLn7gbRulIKz5WpxpgqJDo2" ||
+    user?.email?.toLowerCase() === "infropayao@gmail.com" ||
+    !!serverAdmin;
 
   return (
     <div className="min-h-screen flex">
@@ -140,7 +149,7 @@ function ProdutorLayout() {
             <div className="text-[10px] text-muted-foreground mt-0.5">painel do produtor</div>
           </div>
         </Link>
-        <NavBody pathname={pathname} admin={admin} />
+        <NavBody pathname={pathname} admin={isUserAdmin} />
       </aside>
 
       <div className="flex-1 min-w-0 flex flex-col">
@@ -152,8 +161,13 @@ function ProdutorLayout() {
               Infro<span className="text-gradient-gold">Pay</span>
             </div>
           </Link>
-          <div className="hidden md:block text-xs uppercase tracking-widest text-muted-foreground">
-            Painel do produtor
+          <div className="hidden md:flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
+            <span>Painel do produtor</span>
+            {isUserAdmin && (
+              <span className="bg-gold/20 text-gold font-bold text-[10px] px-2 py-0.5 rounded-full">
+                Admin
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
@@ -171,7 +185,7 @@ function ProdutorLayout() {
                   <img src={logoMark} alt="" className="h-8 w-8 rounded-md" />
                   <div className="text-base font-bold">Menu do produtor</div>
                 </div>
-                <NavBody pathname={pathname} admin={admin} onNav={() => setOpen(false)} />
+                <NavBody pathname={pathname} admin={isUserAdmin} onNav={() => setOpen(false)} />
               </SheetContent>
             </Sheet>
           </div>

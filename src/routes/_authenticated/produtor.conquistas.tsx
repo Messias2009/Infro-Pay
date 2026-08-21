@@ -77,8 +77,11 @@ function Page() {
             <div className="w-full max-w-[320px]">
               <AwardPlaque
                 level={current}
+                sellerName={data?.full_name || data?.username || "Produtor InfroPay"}
                 milestoneText={`${kz(revenue)} Faturados`}
                 showActions={false}
+                isUnlocked={true}
+                userRevenueCents={revenue}
               />
             </div>
           </div>
@@ -215,8 +218,11 @@ function Page() {
             <div className="flex justify-center my-2">
               <AwardPlaque
                 level={selectedLevel}
+                sellerName={data?.full_name || data?.username || "Produtor InfroPay"}
                 milestoneText={`Meta de ${kz(selectedLevel.min_cents)}`}
                 showActions={true}
+                isUnlocked={revenue >= selectedLevel.min_cents}
+                userRevenueCents={revenue}
               />
             </div>
           </DialogContent>

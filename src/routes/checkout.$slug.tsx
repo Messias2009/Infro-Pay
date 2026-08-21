@@ -208,39 +208,39 @@ function Checkout() {
         }}
       />
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 md:py-12">
+      <div className="mx-auto w-full max-w-6xl px-3.5 sm:px-6 py-6 sm:py-8 md:py-12">
         {/* TOP BAR / LOGO & NAVIGATION */}
-        <div className="flex items-center justify-between gap-4 pb-6 mb-6 border-b border-border/60">
+        <div className="flex items-center justify-between gap-3 pb-5 mb-6 border-b border-border/60 w-full flex-wrap sm:flex-nowrap">
           <Link
             to="/produto/$slug"
             params={{ slug }}
-            className="inline-flex items-center text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition"
+            className="inline-flex items-center text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition shrink-0"
           >
-            <ArrowLeft className="h-4 w-4 mr-1.5" /> Voltar aos detalhes
+            <ArrowLeft className="h-4 w-4 mr-1.5 shrink-0" /> Voltar aos detalhes
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <img
               src={logoImg}
               alt="InfroPay"
               className="h-7 w-auto object-contain hidden sm:block"
             />
             <img src={markImg} alt="InfroPay" className="h-7 w-7 object-contain sm:hidden" />
-            <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80 pl-2 border-l border-border">
-              <Lock className="h-3 w-3 text-gold" /> Checkout 100% Seguro
+            <span className="hidden md:inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground/80 pl-2 border-l border-border">
+              <Lock className="h-3.5 w-3.5 text-gold shrink-0" /> Checkout 100% Seguro
             </span>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-[1.35fr_1fr] gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] gap-6 lg:gap-8 items-start w-full min-w-0">
           {/* LEFT COLUMN: BUYER FORM, PAYMENT METHOD & ORDER BUMP */}
           <form
             onSubmit={submit}
-            className="rounded-2xl border border-border bg-card p-5 sm:p-7 md:p-8 space-y-8 shadow-card"
+            className="w-full min-w-0 rounded-2xl border border-border bg-card p-3.5 sm:p-6 md:p-8 space-y-6 sm:space-y-8 shadow-card overflow-hidden"
           >
             {/* PRODUCT HERO / HEADER CARD */}
-            <div className="flex gap-4 p-4 rounded-xl bg-secondary/40 border border-border/60">
-              <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl overflow-hidden bg-gradient-to-br from-primary/20 to-gold/10 shrink-0 border border-border/60">
+            <div className="flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-secondary/40 border border-border/60 w-full min-w-0 items-center">
+              <div className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-xl overflow-hidden bg-gradient-to-br from-primary/20 to-gold/10 shrink-0 border border-border/60">
                 {p.cover_url ? (
                   <img src={p.cover_url} alt={p.title} className="h-full w-full object-cover" />
                 ) : (
@@ -251,19 +251,20 @@ function Checkout() {
               </div>
               <div className="min-w-0 flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-gold mb-1">
-                    <BadgeCheck className="h-3 w-3 text-gold" /> Produto Digital Oficial
+                  <div className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-gold mb-1">
+                    <BadgeCheck className="h-3.5 w-3.5 text-gold shrink-0" /> Produto Digital
+                    Oficial
                   </div>
-                  <h1 className="text-base sm:text-lg font-bold line-clamp-2 text-foreground">
+                  <h1 className="text-base sm:text-lg font-bold line-clamp-2 text-foreground break-words">
                     {p.title}
                   </h1>
                 </div>
-                <div className="flex items-baseline gap-2 mt-2">
+                <div className="flex items-baseline gap-2 mt-2 flex-wrap">
                   <span className="text-xl sm:text-2xl font-extrabold text-gradient-gold">
                     {fmt(basePrice, p.currency)}
                   </span>
                   {p.promo_price_cents && p.promo_price_cents < p.price_cents && (
-                    <span className="text-xs text-muted-foreground line-through">
+                    <span className="text-xs sm:text-sm text-muted-foreground line-through">
                       {fmt(p.price_cents, p.currency)}
                     </span>
                   )}
@@ -272,31 +273,31 @@ function Checkout() {
             </div>
 
             {/* SECTION 1: BUYER INFORMATION */}
-            <section className="space-y-4">
+            <section className="space-y-4 w-full min-w-0">
               <div className="flex items-center gap-2 pb-2 border-b border-border/50">
-                <span className="h-6 w-6 rounded-full gradient-brand text-primary-foreground text-xs font-bold grid place-items-center">
+                <span className="h-6 w-6 rounded-full gradient-brand text-primary-foreground text-xs font-bold grid place-items-center shrink-0">
                   1
                 </span>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                <h2 className="text-sm sm:text-base font-bold uppercase tracking-wider text-foreground">
                   Dados do comprador
                 </h2>
               </div>
 
-              <div className="grid gap-4">
-                <div>
-                  <Label className="text-xs font-semibold text-foreground">Nome completo *</Label>
+              <div className="grid gap-4 w-full min-w-0">
+                <div className="w-full">
+                  <Label className="text-sm font-semibold text-foreground">Nome completo *</Label>
                   <Input
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Ex.: António Manuel Silva"
-                    className="mt-1.5 h-11 bg-background"
+                    className="mt-1.5 h-11 sm:h-12 text-sm sm:text-base bg-background w-full"
                   />
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-xs font-semibold text-foreground">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
+                  <div className="w-full min-w-0">
+                    <Label className="text-sm font-semibold text-foreground">
                       Email de entrega *
                     </Label>
                     <Input
@@ -305,14 +306,14 @@ function Checkout() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="seuemail@exemplo.com"
-                      className="mt-1.5 h-11 bg-background"
+                      className="mt-1.5 h-11 sm:h-12 text-sm sm:text-base bg-background w-full"
                     />
-                    <span className="text-[11px] text-muted-foreground mt-1 block">
+                    <span className="text-xs text-muted-foreground mt-1 block">
                       O acesso ao produto será enviado para este email.
                     </span>
                   </div>
-                  <div>
-                    <Label className="text-xs font-semibold text-foreground">
+                  <div className="w-full min-w-0">
+                    <Label className="text-sm font-semibold text-foreground">
                       Telefone / WhatsApp *
                     </Label>
                     <Input
@@ -320,9 +321,9 @@ function Checkout() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="Ex.: +244 923 000 000"
-                      className="mt-1.5 h-11 bg-background"
+                      className="mt-1.5 h-11 sm:h-12 text-sm sm:text-base bg-background w-full"
                     />
-                    <span className="text-[11px] text-muted-foreground mt-1 block">
+                    <span className="text-xs text-muted-foreground mt-1 block">
                       Para confirmação imediata da compra.
                     </span>
                   </div>
@@ -331,17 +332,17 @@ function Checkout() {
             </section>
 
             {/* SECTION 2: PAYMENT METHOD */}
-            <section className="space-y-4">
+            <section className="space-y-4 w-full min-w-0">
               <div className="flex items-center gap-2 pb-2 border-b border-border/50">
-                <span className="h-6 w-6 rounded-full gradient-brand text-primary-foreground text-xs font-bold grid place-items-center">
+                <span className="h-6 w-6 rounded-full gradient-brand text-primary-foreground text-xs font-bold grid place-items-center shrink-0">
                   2
                 </span>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                <h2 className="text-sm sm:text-base font-bold uppercase tracking-wider text-foreground">
                   Método de pagamento
                 </h2>
               </div>
 
-              <div className="grid gap-3">
+              <div className="grid gap-3 w-full min-w-0">
                 {METHODS.map((m) => {
                   const Icon = m.icon;
                   const active = method === m.id;
@@ -350,14 +351,14 @@ function Checkout() {
                       type="button"
                       key={m.id}
                       onClick={() => setMethod(m.id)}
-                      className={`relative flex items-start sm:items-center gap-3.5 sm:gap-4 rounded-xl border p-3.5 sm:p-4 text-left transition-all ${
+                      className={`relative flex items-start sm:items-center gap-3 sm:gap-4 rounded-xl border p-3.5 sm:p-4 text-left transition-all w-full cursor-pointer min-w-0 ${
                         active
                           ? "border-primary bg-primary/10 shadow-glow ring-1 ring-primary/40"
                           : "border-border/80 bg-background/50 hover:border-primary/40 hover:bg-secondary/30"
                       }`}
                     >
                       <div
-                        className={`h-11 w-11 rounded-xl grid place-items-center shrink-0 ${
+                        className={`h-10 w-10 sm:h-11 sm:w-11 rounded-xl grid place-items-center shrink-0 ${
                           active
                             ? "gradient-brand text-primary-foreground shadow-md"
                             : "bg-secondary text-muted-foreground"
@@ -367,17 +368,19 @@ function Checkout() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-sm text-foreground">{m.label}</span>
-                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold text-gold border border-gold/20">
+                          <span className="font-bold text-sm sm:text-base text-foreground">
+                            {m.label}
+                          </span>
+                          <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold text-gold border border-gold/20">
                             {m.badge}
                           </span>
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1 leading-snug">
+                        <div className="text-xs sm:text-sm text-muted-foreground mt-1 leading-snug">
                           {m.desc}
                         </div>
                       </div>
                       <div
-                        className={`h-5 w-5 rounded-full border-2 grid place-items-center shrink-0 mt-1 sm:mt-0 ${
+                        className={`h-5 w-5 rounded-full border-2 grid place-items-center shrink-0 mt-0.5 sm:mt-0 ${
                           active
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-border"
@@ -393,63 +396,63 @@ function Checkout() {
 
             {/* SECTION 3: ORDER BUMP (SE EXISTIR OFERTA COMPLEMENTAR) */}
             {orderBump && (
-              <section className="animate-fade-in">
+              <section className="animate-fade-in w-full min-w-0">
                 <div
                   onClick={() => setIncludeBump((prev) => !prev)}
-                  className={`cursor-pointer relative overflow-hidden rounded-2xl border-2 transition-all p-4 sm:p-5 ${
+                  className={`cursor-pointer rounded-2xl border-2 transition-all p-3.5 sm:p-5 w-full min-w-0 ${
                     includeBump
                       ? "border-gold bg-gold/10 shadow-glow"
                       : "border-gold/50 bg-gold/5 hover:border-gold hover:bg-gold/10"
                   }`}
                 >
-                  <div className="absolute top-0 right-0 rounded-bl-xl bg-gold px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gold-foreground flex items-center gap-1 shadow-sm">
-                    <Gift className="h-3 w-3" /> Oferta Especial
+                  {/* Top Badge & Header */}
+                  <div className="flex items-center justify-between gap-2 mb-3 pb-2.5 border-b border-gold/20 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={includeBump}
+                        onChange={(e) => setIncludeBump(e.target.checked)}
+                        className="h-5 w-5 rounded border-gold/60 text-gold focus:ring-gold accent-gold shrink-0 cursor-pointer"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <span className="text-xs sm:text-sm font-bold text-foreground">
+                        {orderBump.headline || `Adicionar oferta exclusiva complementar`}
+                      </span>
+                    </div>
+                    <span className="rounded-full bg-gold px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-gold-foreground flex items-center gap-1 shadow-sm shrink-0">
+                      <Gift className="h-3.5 w-3.5 shrink-0" /> Oferta Especial
+                    </span>
                   </div>
 
-                  <div className="flex items-start gap-3.5 sm:gap-4 pt-1">
-                    <input
-                      type="checkbox"
-                      checked={includeBump}
-                      onChange={(e) => setIncludeBump(e.target.checked)}
-                      className="mt-1 h-5 w-5 rounded border-gold/60 text-gold focus:ring-gold accent-gold shrink-0 cursor-pointer"
-                      onClick={(e) => e.stopPropagation()}
-                    />
+                  <div className="flex items-start gap-3 sm:gap-4 w-full min-w-0">
+                    {orderBump.offer?.cover_url ? (
+                      <img
+                        src={orderBump.offer.cover_url}
+                        alt={orderBump.offer.title}
+                        className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl object-cover border border-gold/30 shrink-0"
+                      />
+                    ) : (
+                      <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl bg-gold/20 border border-gold/30 grid place-items-center text-xs font-bold text-gold shrink-0">
+                        BUMP
+                      </div>
+                    )}
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs sm:text-sm font-bold text-foreground">
-                          {orderBump.headline || `Adicionar oferta exclusiva complementar`}
-                        </span>
+                      <div className="font-bold text-sm sm:text-base text-foreground leading-snug break-words">
+                        {orderBump.offer?.title || orderBump.headline}
+                      </div>
+                      <div className="text-sm font-extrabold text-gold mt-1">
+                        + {fmt(orderBump.offer_price_cents, p.currency)}
                       </div>
 
-                      {orderBump.offer && (
-                        <div className="mt-2 flex items-center gap-3">
-                          {orderBump.offer.cover_url && (
-                            <img
-                              src={orderBump.offer.cover_url}
-                              alt={orderBump.offer.title}
-                              className="h-12 w-12 rounded-lg object-cover border border-gold/30 shrink-0"
-                            />
-                          )}
-                          <div className="min-w-0">
-                            <div className="text-xs font-semibold text-foreground truncate">
-                              {orderBump.offer.title}
-                            </div>
-                            <div className="text-xs font-bold text-gold">
-                              + {fmt(orderBump.offer_price_cents, p.currency)}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
                       {orderBump.description && (
-                        <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                        <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">
                           {orderBump.description}
                         </p>
                       )}
 
-                      <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-gold">
-                        <Gift className="h-3.5 w-3.5" />
+                      <div className="mt-3 inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gold">
+                        <Gift className="h-4 w-4 shrink-0" />
                         {includeBump
                           ? "✓ Oferta especial incluída no pedido"
                           : "Clique para adicionar ao seu pedido"}
@@ -461,39 +464,45 @@ function Checkout() {
             )}
 
             {/* SUBMIT BUTTON */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-3 pt-2 w-full min-w-0">
               <Button
                 disabled={loading}
                 size="lg"
                 type="submit"
-                className="w-full h-14 gradient-brand text-primary-foreground shadow-glow text-base sm:text-lg font-bold transition-all hover:scale-[1.01] active:scale-[0.99]"
+                className="w-full min-h-12 sm:min-h-14 py-3 px-4 gradient-brand text-primary-foreground shadow-glow text-sm sm:text-base md:text-lg font-bold transition-all hover:scale-[1.005] active:scale-[0.99] cursor-pointer whitespace-normal break-words text-center leading-tight flex items-center justify-center"
               >
-                <Lock className="h-5 w-5 mr-2" />
-                {loading
-                  ? "A processar pedido..."
-                  : `Pagar ${fmt(totalPrice, p.currency)} — Finalizar Compra`}
+                <Lock className="h-4 w-4 sm:h-5 sm:w-5 mr-2 shrink-0 inline" />
+                <span>
+                  {loading
+                    ? "A processar pedido..."
+                    : `Pagar ${fmt(totalPrice, p.currency)} — Finalizar Compra`}
+                </span>
               </Button>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-muted-foreground text-center">
+              <div className="flex flex-wrap items-center justify-center gap-2 text-xs sm:text-sm text-muted-foreground text-center">
                 <span className="flex items-center gap-1 text-success font-medium">
-                  <ShieldCheck className="h-3.5 w-3.5" /> Compra 100% Segura
+                  <ShieldCheck className="h-4 w-4 shrink-0" /> Compra 100% Segura
                 </span>
-                <span className="hidden sm:inline">·</span>
-                <span>Criptografia de 256 bits</span>
-                <span className="hidden sm:inline">·</span>
+                <span>·</span>
+                <span>Criptografia SSL 256 bits</span>
+                <span>·</span>
                 <span>Entrega imediata</span>
               </div>
 
-              <div className="pt-2 text-center text-[11px] text-muted-foreground border-t border-border/40">
+              <div className="pt-2 text-center text-xs text-muted-foreground border-t border-border/40 leading-relaxed">
                 Ao clicar em finalizar compra, você declara que leu e concorda com os nossos{" "}
-                <Link to="/termos" target="_blank" className="text-gold underline hover:opacity-80">
+                <Link
+                  to="/termos"
+                  target="_blank"
+                  className="text-gold underline hover:opacity-80 font-medium"
+                >
                   Termos de Uso
                 </Link>{" "}
                 e{" "}
                 <Link
                   to="/privacidade"
                   target="_blank"
-                  className="text-gold underline hover:opacity-80"
+                  className="text-gold underline hover:opacity-80 font-medium"
                 >
                   Política de Privacidade
                 </Link>
@@ -503,32 +512,34 @@ function Checkout() {
           </form>
 
           {/* RIGHT COLUMN: ORDER SUMMARY & PRODUCT BENEFITS */}
-          <aside className="space-y-6 lg:sticky lg:top-24">
+          <aside className="space-y-6 lg:sticky lg:top-24 w-full min-w-0">
             {/* RESUMO DO PEDIDO */}
-            <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-card">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card w-full min-w-0 overflow-hidden">
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
-                <span className="text-xs font-bold uppercase tracking-widest text-gold">
+                <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-gold">
                   Resumo do pedido
                 </span>
-                <span className="text-xs text-muted-foreground">1 item</span>
+                <span className="text-xs sm:text-sm text-muted-foreground">
+                  {includeBump ? "2 itens" : "1 item"}
+                </span>
               </div>
 
               {/* MAIN PRODUCT ROW */}
-              <div className="flex gap-3 pb-4 border-b border-border/50">
-                <div className="h-16 w-16 rounded-xl overflow-hidden bg-secondary shrink-0 border border-border/50">
+              <div className="flex gap-3 pb-4 border-b border-border/50 items-center w-full min-w-0">
+                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-xl overflow-hidden bg-secondary shrink-0 border border-border/50">
                   {p.cover_url ? (
                     <img src={p.cover_url} alt="" className="h-full w-full object-cover" />
                   ) : (
-                    <div className="h-full w-full grid place-items-center text-[10px] text-muted-foreground">
-                      Infoproduto
+                    <div className="h-full w-full grid place-items-center text-xs text-muted-foreground">
+                      Produto
                     </div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-sm line-clamp-2 text-foreground">
+                  <div className="font-semibold text-sm sm:text-base line-clamp-2 text-foreground break-words">
                     {p.title}
                   </div>
-                  <div className="text-xs font-bold text-foreground mt-1">
+                  <div className="text-sm font-bold text-foreground mt-1">
                     {fmt(basePrice, p.currency)}
                   </div>
                 </div>
@@ -536,7 +547,7 @@ function Checkout() {
 
               {/* ORDER BUMP ROW (IF SELECTED) */}
               {includeBump && orderBump && (
-                <div className="flex gap-3 py-3 border-b border-border/50 bg-gold/5 -mx-5 px-5 animate-fade-in">
+                <div className="my-3 p-3 rounded-xl border border-gold/30 bg-gold/5 animate-fade-in flex gap-3 items-center w-full min-w-0">
                   <div className="h-12 w-12 rounded-lg overflow-hidden bg-secondary shrink-0 border border-gold/30">
                     {orderBump.offer?.cover_url ? (
                       <img
@@ -545,19 +556,19 @@ function Checkout() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="h-full w-full grid place-items-center text-[10px] text-gold font-bold">
+                      <div className="h-full w-full grid place-items-center text-xs text-gold font-bold">
                         BUMP
                       </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold uppercase text-gold">
+                    <span className="text-xs font-bold uppercase text-gold block">
                       Oferta Especial
                     </span>
-                    <div className="font-medium text-xs truncate text-foreground">
+                    <div className="font-medium text-xs sm:text-sm truncate text-foreground">
                       {orderBump.offer?.title || orderBump.headline}
                     </div>
-                    <div className="text-xs font-bold text-gold mt-0.5">
+                    <div className="text-xs sm:text-sm font-bold text-gold mt-0.5">
                       + {fmt(orderBump.offer_price_cents, p.currency)}
                     </div>
                   </div>
@@ -565,27 +576,29 @@ function Checkout() {
               )}
 
               {/* PRICE CALCULATIONS */}
-              <div className="mt-4 space-y-2.5 text-sm">
-                <div className="flex justify-between text-muted-foreground text-xs sm:text-sm">
+              <div className="mt-4 space-y-2.5 text-sm sm:text-base w-full min-w-0">
+                <div className="flex justify-between text-muted-foreground text-sm">
                   <span>Produto principal</span>
-                  <span>{fmt(basePrice, p.currency)}</span>
+                  <span className="font-medium text-foreground">{fmt(basePrice, p.currency)}</span>
                 </div>
 
                 {includeBump && orderBump && (
-                  <div className="flex justify-between text-gold text-xs sm:text-sm font-medium">
+                  <div className="flex justify-between text-gold text-sm font-medium">
                     <span>Oferta adicional</span>
                     <span>+{fmt(orderBump.offer_price_cents, p.currency)}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between text-muted-foreground text-xs sm:text-sm">
+                <div className="flex justify-between text-muted-foreground text-sm">
                   <span>Taxas de processamento</span>
                   <span className="text-success font-semibold">Grátis (0%)</span>
                 </div>
 
                 <div className="pt-3 border-t border-border flex justify-between items-baseline">
-                  <span className="text-sm font-bold text-foreground">Valor Total</span>
-                  <span className="text-2xl font-extrabold text-gradient-gold">
+                  <span className="text-sm sm:text-base font-bold text-foreground">
+                    Valor Total
+                  </span>
+                  <span className="text-xl sm:text-2xl font-extrabold text-gradient-gold">
                     {fmt(totalPrice, p.currency)}
                   </span>
                 </div>
@@ -593,21 +606,21 @@ function Checkout() {
             </div>
 
             {/* BENEFÍCIOS & GARANTIA */}
-            <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 space-y-4 shadow-card">
-              <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 shadow-card w-full min-w-0">
+              <div className="text-xs sm:text-sm font-bold uppercase tracking-widest text-muted-foreground">
                 Garantia e Segurança
               </div>
 
               <div className="space-y-3">
                 <div className="flex gap-3">
                   <div className="h-8 w-8 rounded-lg bg-success/10 grid place-items-center shrink-0">
-                    <ShieldCheck className="h-4 w-4 text-success" />
+                    <ShieldCheck className="h-4 w-4 text-success shrink-0" />
                   </div>
-                  <div className="text-xs">
+                  <div className="text-xs sm:text-sm">
                     <div className="font-semibold text-foreground">
                       Garantia incondicional de {p.guarantee_days ?? 7} dias
                     </div>
-                    <div className="text-muted-foreground mt-0.5">
+                    <div className="text-muted-foreground mt-0.5 leading-relaxed">
                       Satisfação garantida ou seu dinheiro de volta sem complicações.
                     </div>
                   </div>
@@ -615,11 +628,11 @@ function Checkout() {
 
                 <div className="flex gap-3">
                   <div className="h-8 w-8 rounded-lg bg-gold/10 grid place-items-center shrink-0">
-                    <Zap className="h-4 w-4 text-gold" />
+                    <Zap className="h-4 w-4 text-gold shrink-0" />
                   </div>
-                  <div className="text-xs">
+                  <div className="text-xs sm:text-sm">
                     <div className="font-semibold text-foreground">Acesso Imediato</div>
-                    <div className="text-muted-foreground mt-0.5">
+                    <div className="text-muted-foreground mt-0.5 leading-relaxed">
                       Receba o link de download e instruções logo após a confirmação.
                     </div>
                   </div>
@@ -627,11 +640,11 @@ function Checkout() {
 
                 <div className="flex gap-3">
                   <div className="h-8 w-8 rounded-lg bg-primary/10 grid place-items-center shrink-0">
-                    <Lock className="h-4 w-4 text-primary" />
+                    <Lock className="h-4 w-4 text-primary shrink-0" />
                   </div>
-                  <div className="text-xs">
+                  <div className="text-xs sm:text-sm">
                     <div className="font-semibold text-foreground">Dados 100% Protegidos</div>
-                    <div className="text-muted-foreground mt-0.5">
+                    <div className="text-muted-foreground mt-0.5 leading-relaxed">
                       Processamento encriptado e seguro pela infraestrutura InfroPay.
                     </div>
                   </div>

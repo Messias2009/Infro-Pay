@@ -29,7 +29,7 @@ import {
 import { FeeBanner, kz } from "@/components/finance/FeeBanner";
 
 export const Route = createFileRoute("/_authenticated/produtor/saques")({
-  head: () => ({ meta: [{ title: "Saques — Infropai" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Saques — InfroPay" }, { name: "robots", content: "noindex" }] }),
   component: Page,
 });
 
@@ -285,7 +285,7 @@ function Page() {
               </div>
               <div className="flex justify-between items-center text-destructive">
                 <span className="flex items-center gap-1">
-                  Taxa da Infropai ({WITHDRAWAL_FEE_PERCENT}%)
+                  Taxa da InfroPay ({WITHDRAWAL_FEE_PERCENT}%)
                 </span>
                 <span className="font-mono">-{kz(feePreview)}</span>
               </div>

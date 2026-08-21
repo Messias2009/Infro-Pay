@@ -13,6 +13,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() && (
+        request.auth.uid == "rsKuyZLn7gbRulIKz5WpxpgqJDo2" ||
         request.auth.token.email == "infropayao@gmail.com" ||
         exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
@@ -69,9 +70,23 @@ service cloud.firestore {
     // Products Collection
     match /products/{productId} {
       allow read: if true;
-      allow create: if isAuthenticated() && request.resource.data.sellerId == request.auth.uid;
-      allow update: if isAuthenticated() && (resource.data.sellerId == request.auth.uid || isAdmin());
-      allow delete: if isAuthenticated() && (resource.data.sellerId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (
+        request.resource.data.sellerId == request.auth.uid ||
+        request.resource.data.producer_id == request.auth.uid ||
+        request.resource.data.userId == request.auth.uid
+      );
+      allow update: if isAuthenticated() && (
+        resource.data.sellerId == request.auth.uid ||
+        resource.data.producer_id == request.auth.uid ||
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAuthenticated() && (
+        resource.data.sellerId == request.auth.uid ||
+        resource.data.producer_id == request.auth.uid ||
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
     }
 
     // Sales Collection

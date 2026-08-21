@@ -27,7 +27,7 @@ import { getPlatformReport, exportCsv } from "@/lib/admin.functions";
 export const Route = createFileRoute("/_authenticated/adm/relatorios")({
   head: () => ({
     meta: [
-      { title: "Relatórios — Admin Infropai" },
+      { title: "Relatórios — Admin InfroPay" },
       { name: "description", content: "Faturamento, comissões e desempenho global da plataforma." },
       { name: "robots", content: "noindex" },
     ],
@@ -50,7 +50,7 @@ function Page() {
       const blob = new Blob([csv as string], { type: "text/csv;charset=utf-8" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `infropai-${kind}-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `infropay-${kind}-${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(a.href);
     } catch (e) {
@@ -86,7 +86,7 @@ function Page() {
     },
     {
       icon: ShieldCheck,
-      label: "Receita Total Infropai",
+      label: "Receita Total InfroPay",
       value: kz(totalPlatformRevenue),
       accent: "text-gold font-bold",
     },

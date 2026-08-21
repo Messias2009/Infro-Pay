@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import {
   Plus,
@@ -14,17 +13,20 @@ import {
   Share2,
   Trash2,
   Copy as CopyIcon,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ProductActions } from "@/components/products/ProductActions";
 import { QrDialog } from "@/components/products/QrDialog";
 import {
-  listMyProducts,
-  submitProductForApproval,
-  duplicateProduct,
-  deleteProduct,
-} from "@/lib/products.functions";
+  getProducerProducts,
+  updateProductInFirestore,
+  deleteProductFromFirestore,
+  duplicateProductInFirestore,
+  type UnifiedProduct,
+} from "@/lib/products.service";
+import { useAuth } from "@/hooks/useAuth";
 import { productLinks, copy, shareLink } from "@/lib/product-links";
 
 export const Route = createFileRoute("/_authenticated/produtor/produtos")({
@@ -54,13 +56,15 @@ const LABEL: Record<string, string> = {
 
 function MeusProdutos() {
   const router = useRouter();
-  const fn = useServerFn(listMyProducts);
-  const submitFn = useServerFn(submitProductForApproval);
-  const dupFn = useServerFn(duplicateProduct);
-  const delFn = useServerFn(deleteProduct);
-  const { data: products, refetch } = useQuery({
-    queryKey: ["producer", "products"],
-    queryFn: () => fn(),
+  const { user } = useAuth();
+  const {
+    data: products,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["producer", "products", user?.uid],
+    queryFn: () => getProducerProducts(user?.uid),
+    refetchOnWindowFocus: true,
   });
   const [qr, setQr] = useState<{ url: string; title: string } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -68,8 +72,8 @@ function MeusProdutos() {
   async function submitOne(id: string) {
     setBusy(id);
     try {
-      await submitFn({ data: { id } });
-      toast.success("Produto publicado!");
+      await updateProductInFirestore(id, { status: "publicado", rejection_reason: null });
+      toast.success("Produto publicado com sucesso!");
       await refetch();
       router.navigate({ to: "/produtor/sucesso/$id", params: { id } });
     } catch (e) {
@@ -81,7 +85,7 @@ function MeusProdutos() {
 
   async function dup(id: string) {
     try {
-      await dupFn({ data: { id } });
+      await duplicateProductInFirestore(id);
       toast.success("Produto duplicado como rascunho");
       refetch();
     } catch (e) {
@@ -92,7 +96,7 @@ function MeusProdutos() {
   async function del(id: string) {
     if (!confirm("Excluir este produto definitivamente?")) return;
     try {
-      await delFn({ data: { id } });
+      await deleteProductFromFirestore(id);
       toast.success("Produto excluído");
       refetch();
     } catch (e) {
@@ -106,34 +110,46 @@ function MeusProdutos() {
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-10 max-w-6xl">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 mb-8 sm:flex sm:justify-between">
+    <div className="p-4 sm:p-6 md:p-10 max-w-6xl mx-auto min-w-0 max-w-full overflow-hidden">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 mb-6 sm:mb-8 sm:flex sm:justify-between">
         <div className="min-w-0">
           <div className="text-xs uppercase tracking-widest text-gold font-semibold">Catálogo</div>
-          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mt-2">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mt-1 sm:mt-2 truncate">
             Os meus produtos
           </h1>
         </div>
         <Link to="/produtor/novo" className="shrink-0">
-          <Button className="gradient-brand text-primary-foreground shadow-glow">
+          <Button
+            size="sm"
+            className="gradient-brand text-primary-foreground shadow-glow sm:h-10 sm:px-4"
+          >
             <Plus className="h-4 w-4 mr-1" />
             Novo produto
           </Button>
         </Link>
       </div>
 
-      {!products || products.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center p-16 text-muted-foreground gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p>A carregar produtos...</p>
+        </div>
+      ) : !products || products.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card/40 p-16 text-center">
           <Package className="h-12 w-12 text-gold mx-auto mb-3" />
           <h3 className="font-display text-xl font-semibold">Sem produtos ainda</h3>
-          <Link to="/produtor/novo" className="inline-block mt-4">
+          <p className="text-sm text-muted-foreground mt-2 max-w-sm mx-auto">
+            Ainda não tem produtos cadastrados no seu painel. Crie o seu primeiro produto digital
+            agora.
+          </p>
+          <Link to="/produtor/novo" className="inline-block mt-5">
             <Button className="gradient-brand text-primary-foreground">
               Criar primeiro produto
             </Button>
           </Link>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 min-w-0">
           {products.map((p) => {
             const links = productLinks(p.slug);
             return (

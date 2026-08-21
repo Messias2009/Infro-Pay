@@ -11,9 +11,11 @@ import {
   BarChart3,
   ScrollText,
   Bell,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { isAdmin, bootstrapAdmin } from "@/lib/admin.functions";
+import { isAdmin as isAdminFn, bootstrapAdmin } from "@/lib/admin.functions";
+import { useAuth } from "@/hooks/useAuth";
 import logoMark from "@/assets/infropay-mark.png";
 
 export const Route = createFileRoute("/_authenticated/adm")({
@@ -25,9 +27,9 @@ export const Route = createFileRoute("/_authenticated/adm")({
 
 const items = [
   { to: "/adm", icon: ShieldCheck, label: "Aprovações", exact: true },
+  { to: "/adm/usuarios", icon: Users, label: "Usuários & Vendedores" },
   { to: "/adm/notificacoes", icon: Bell, label: "Notificações & Broadcast" },
   { to: "/adm/produtos", icon: Package, label: "Todos os produtos" },
-  { to: "/adm/usuarios", icon: Users, label: "Usuários" },
   { to: "/adm/relatorios", icon: BarChart3, label: "Relatórios" },
   { to: "/adm/logs", icon: ScrollText, label: "Logs" },
   { to: "/adm/saques", icon: Banknote, label: "Saques" },
@@ -35,13 +37,20 @@ const items = [
 
 function AdmLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const adminFn = useServerFn(isAdmin);
+  const { user, isAdmin: authIsAdmin, loading: authLoading } = useAuth();
+  const adminServerFn = useServerFn(isAdminFn);
   const bootFn = useServerFn(bootstrapAdmin);
   const {
-    data: admin,
-    isLoading,
+    data: serverAdmin,
+    isLoading: serverLoading,
     refetch,
-  } = useQuery({ queryKey: ["is-admin"], queryFn: () => adminFn() });
+  } = useQuery({ queryKey: ["is-admin"], queryFn: () => adminServerFn() });
+
+  const isUserAdmin =
+    authIsAdmin ||
+    user?.uid === "rsKuyZLn7gbRulIKz5WpxpgqJDo2" ||
+    user?.email?.toLowerCase() === "infropayao@gmail.com" ||
+    !!serverAdmin;
 
   async function claim() {
     try {
@@ -55,9 +64,11 @@ function AdmLayout() {
     }
   }
 
-  if (isLoading) return <div className="p-10 text-muted-foreground">A verificar permissões...</div>;
+  if (authLoading && serverLoading) {
+    return <div className="p-10 text-muted-foreground">A verificar permissões...</div>;
+  }
 
-  if (!admin) {
+  if (!isUserAdmin) {
     return (
       <div className="min-h-screen grid place-items-center p-6">
         <div className="max-w-md w-full rounded-2xl border border-border bg-card p-8 text-center">
@@ -66,20 +77,13 @@ function AdmLayout() {
           </div>
           <h1 className="font-display text-2xl font-bold mt-4">Acesso restrito</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Esta área é apenas para administradores. Se este projeto ainda não tem administrador,
-            pode tornar-se o primeiro.
+            Esta área é apenas para administradores autorizados da InfroPay.
           </p>
-          <Button
-            onClick={claim}
-            className="mt-6 gradient-brand text-primary-foreground shadow-glow"
-          >
-            <ShieldCheck className="h-4 w-4 mr-1" /> Tornar-me administrador
-          </Button>
           <Link
             to="/produtor"
-            className="block mt-4 text-sm text-muted-foreground hover:text-foreground"
+            className="inline-block mt-6 px-4 py-2 rounded-lg bg-gold text-primary-foreground text-sm font-medium hover:bg-gold/90 transition"
           >
-            ← Voltar ao painel
+            ← Voltar ao meu painel
           </Link>
         </div>
       </div>
