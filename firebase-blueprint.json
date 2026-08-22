@@ -9,8 +9,16 @@
         "name": { "type": "string", "description": "Full name or producer name" },
         "email": { "type": "string", "format": "email", "description": "User email address" },
         "photoURL": { "type": "string", "description": "User avatar image URL" },
-        "role": { "type": "string", "enum": ["user", "seller", "admin"], "description": "User role" },
-        "status": { "type": "string", "enum": ["active", "suspended", "banned"], "description": "Account status" },
+        "role": {
+          "type": "string",
+          "enum": ["user", "seller", "admin"],
+          "description": "User role"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "suspended", "banned"],
+          "description": "Account status"
+        },
         "createdAt": { "type": "string", "description": "ISO timestamp" },
         "updatedAt": { "type": "string", "description": "ISO timestamp" },
         "lastLoginAt": { "type": "string", "description": "ISO timestamp" }
@@ -28,7 +36,10 @@
         "totalSales": { "type": "number", "description": "Gross total sales in AOA" },
         "totalWithdrawn": { "type": "number", "description": "Total net amount withdrawn in AOA" },
         "totalSaleFees": { "type": "number", "description": "Total 2% sale fees charged in AOA" },
-        "totalWithdrawalFees": { "type": "number", "description": "Total 6% withdrawal fees charged in AOA" },
+        "totalWithdrawalFees": {
+          "type": "number",
+          "description": "Total 6% withdrawal fees charged in AOA"
+        },
         "updatedAt": { "type": "string", "description": "ISO timestamp" }
       },
       "required": ["userId", "availableBalance", "pendingBalance", "totalSales", "totalWithdrawn"]
@@ -44,7 +55,11 @@
         "description": { "type": "string", "description": "Product description" },
         "price": { "type": "number", "description": "Price in Angolan Kwanzas (AOA)" },
         "image": { "type": "string", "description": "Product cover image URL" },
-        "status": { "type": "string", "enum": ["draft", "pending", "active", "archived", "rejected"], "description": "Publication status" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "pending", "active", "archived", "rejected"],
+          "description": "Publication status"
+        },
         "createdAt": { "type": "string", "description": "ISO timestamp" },
         "updatedAt": { "type": "string", "description": "ISO timestamp" }
       },
@@ -64,14 +79,34 @@
         "productName": { "type": "string", "description": "Snapshot of product title" },
         "grossAmount": { "type": "number", "description": "Gross sale amount in AOA" },
         "platformFeePercent": { "type": "number", "description": "Commission percent applied (2)" },
-        "platformFeeAmount": { "type": "number", "description": "Commission fee amount in AOA (gross * 0.02)" },
-        "sellerNetAmount": { "type": "number", "description": "Net amount credited to seller in AOA (gross - fee)" },
+        "platformFeeAmount": {
+          "type": "number",
+          "description": "Commission fee amount in AOA (gross * 0.02)"
+        },
+        "sellerNetAmount": {
+          "type": "number",
+          "description": "Net amount credited to seller in AOA (gross - fee)"
+        },
         "paymentMethod": { "type": "string", "description": "Payment gateway method used" },
-        "status": { "type": "string", "enum": ["pending", "paid", "cancelled", "refunded"], "description": "Payment status" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "paid", "cancelled", "refunded"],
+          "description": "Payment status"
+        },
         "createdAt": { "type": "string", "description": "ISO timestamp" },
         "updatedAt": { "type": "string", "description": "ISO timestamp" }
       },
-      "required": ["id", "sellerId", "productId", "grossAmount", "platformFeePercent", "platformFeeAmount", "sellerNetAmount", "status", "createdAt"]
+      "required": [
+        "id",
+        "sellerId",
+        "productId",
+        "grossAmount",
+        "platformFeePercent",
+        "platformFeeAmount",
+        "sellerNetAmount",
+        "status",
+        "createdAt"
+      ]
     },
     "Withdrawal": {
       "title": "Withdrawal",
@@ -81,19 +116,47 @@
         "id": { "type": "string", "description": "Withdrawal unique ID" },
         "userId": { "type": "string", "description": "Producer Auth UID" },
         "requestedAmount": { "type": "number", "description": "Gross requested amount in AOA" },
-        "withdrawalFeePercent": { "type": "number", "description": "Withdrawal fee percent applied (6)" },
-        "withdrawalFeeAmount": { "type": "number", "description": "Withdrawal fee amount in AOA (requested * 0.06)" },
-        "netAmount": { "type": "number", "description": "Net amount to transfer to producer in AOA (requested - fee)" },
+        "withdrawalFeePercent": {
+          "type": "number",
+          "description": "Withdrawal fee percent applied (6)"
+        },
+        "withdrawalFeeAmount": {
+          "type": "number",
+          "description": "Withdrawal fee amount in AOA (requested * 0.06)"
+        },
+        "netAmount": {
+          "type": "number",
+          "description": "Net amount to transfer to producer in AOA (requested - fee)"
+        },
         "method": { "type": "string", "description": "Withdrawal channel (e.g., bank_transfer)" },
-        "accountDetails": { "type": "string", "description": "JSON or formatted bank details (IBAN, Holder, Bank)" },
-        "status": { "type": "string", "enum": ["pending", "in_review", "approved", "paid", "rejected"], "description": "Withdrawal lifecycle status" },
-        "idempotencyKey": { "type": "string", "description": "Unique key ensuring atomic, non-duplicate withdrawal" },
+        "accountDetails": {
+          "type": "string",
+          "description": "JSON or formatted bank details (IBAN, Holder, Bank)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_review", "approved", "paid", "rejected"],
+          "description": "Withdrawal lifecycle status"
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "description": "Unique key ensuring atomic, non-duplicate withdrawal"
+        },
         "requestedAt": { "type": "string", "description": "ISO timestamp" },
         "processedAt": { "type": "string", "description": "ISO timestamp when processed" },
         "processedBy": { "type": "string", "description": "Admin UID who processed withdrawal" },
         "rejectionReason": { "type": "string", "description": "Reason given if rejected" }
       },
-      "required": ["id", "userId", "requestedAmount", "withdrawalFeePercent", "withdrawalFeeAmount", "netAmount", "status", "requestedAt"]
+      "required": [
+        "id",
+        "userId",
+        "requestedAmount",
+        "withdrawalFeePercent",
+        "withdrawalFeeAmount",
+        "netAmount",
+        "status",
+        "requestedAt"
+      ]
     },
     "Transaction": {
       "title": "Transaction",
@@ -102,12 +165,20 @@
       "properties": {
         "id": { "type": "string", "description": "Transaction ID" },
         "userId": { "type": "string", "description": "User Auth UID" },
-        "type": { "type": "string", "enum": ["sale", "commission", "withdrawal", "fee", "credit", "debit"], "description": "Transaction category" },
+        "type": {
+          "type": "string",
+          "enum": ["sale", "commission", "withdrawal", "fee", "credit", "debit"],
+          "description": "Transaction category"
+        },
         "amount": { "type": "number", "description": "Gross amount in AOA" },
         "fee": { "type": "number", "description": "Fee amount in AOA" },
         "netAmount": { "type": "number", "description": "Net amount in AOA" },
         "referenceId": { "type": "string", "description": "Associated saleId or withdrawalId" },
-        "status": { "type": "string", "enum": ["pending", "completed", "failed", "cancelled"], "description": "Transaction status" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "completed", "failed", "cancelled"],
+          "description": "Transaction status"
+        },
         "description": { "type": "string", "description": "Human readable description" },
         "createdAt": { "type": "string", "description": "ISO timestamp" }
       },
@@ -118,10 +189,19 @@
       "description": "Global platform financial configuration",
       "type": "object",
       "properties": {
-        "saleFeePercent": { "type": "number", "description": "Global commission percent per sale (2)" },
-        "withdrawalFeePercent": { "type": "number", "description": "Global withdrawal fee percent (6)" },
+        "saleFeePercent": {
+          "type": "number",
+          "description": "Global commission percent per sale (2)"
+        },
+        "withdrawalFeePercent": {
+          "type": "number",
+          "description": "Global withdrawal fee percent (6)"
+        },
         "currency": { "type": "string", "description": "Platform default currency (AOA)" },
-        "minimumWithdrawal": { "type": "number", "description": "Minimum withdrawal amount in AOA (5000)" },
+        "minimumWithdrawal": {
+          "type": "number",
+          "description": "Minimum withdrawal amount in AOA (5000)"
+        },
         "updatedAt": { "type": "string", "description": "ISO timestamp" }
       },
       "required": ["saleFeePercent", "withdrawalFeePercent", "currency", "minimumWithdrawal"]
@@ -135,7 +215,10 @@
         "adminId": { "type": "string", "description": "Admin Auth UID" },
         "adminName": { "type": "string", "description": "Admin display name" },
         "action": { "type": "string", "description": "Action performed" },
-        "targetType": { "type": "string", "description": "Target entity type (user, product, withdrawal, system)" },
+        "targetType": {
+          "type": "string",
+          "description": "Target entity type (user, product, withdrawal, system)"
+        },
         "targetId": { "type": "string", "description": "Target entity identifier" },
         "details": { "type": "string", "description": "Serialized JSON action details" },
         "createdAt": { "type": "string", "description": "ISO timestamp" }
@@ -172,7 +255,10 @@
         "link": { "type": "string", "description": "Target redirection route" },
         "read": { "type": "boolean", "description": "Read status" },
         "readAt": { "type": "string", "description": "ISO timestamp when read" },
-        "idempotencyKey": { "type": "string", "description": "Unique key to prevent duplicate notifications" },
+        "idempotencyKey": {
+          "type": "string",
+          "description": "Unique key to prevent duplicate notifications"
+        },
         "createdAt": { "type": "string", "description": "ISO timestamp" }
       },
       "required": ["id", "userId", "type", "title", "message", "read", "createdAt"]
@@ -201,7 +287,10 @@
         "emailSales": { "type": "boolean", "description": "Sale emails toggle" },
         "emailWithdrawals": { "type": "boolean", "description": "Withdrawal emails toggle" },
         "emailUpdates": { "type": "boolean", "description": "Platform updates emails toggle" },
-        "securityAlerts": { "type": "boolean", "description": "Security alerts toggle (always true)" },
+        "securityAlerts": {
+          "type": "boolean",
+          "description": "Security alerts toggle (always true)"
+        },
         "updatedAt": { "type": "string", "description": "ISO timestamp" }
       },
       "required": ["userId", "pushEnabled", "emailSales", "emailWithdrawals", "emailUpdates"]
@@ -216,8 +305,15 @@
         "title": { "type": "string", "description": "Announcement title" },
         "message": { "type": "string", "description": "Announcement content" },
         "type": { "type": "string", "description": "Broadcast type" },
-        "audience": { "type": "string", "enum": ["all", "sellers", "buyers", "specific"], "description": "Target audience" },
-        "channels": { "type": "string", "description": "JSON array of channels (in_app, push, email)" },
+        "audience": {
+          "type": "string",
+          "enum": ["all", "sellers", "buyers", "specific"],
+          "description": "Target audience"
+        },
+        "channels": {
+          "type": "string",
+          "description": "JSON array of channels (in_app, push, email)"
+        },
         "sentCount": { "type": "number", "description": "Number of users reached" },
         "createdAt": { "type": "string", "description": "ISO timestamp" }
       },

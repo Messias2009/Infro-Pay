@@ -203,7 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile?.role === "admin";
   const role: UserRole | null = isExplicitAdmin
     ? "admin"
-    : profile?.role ?? (user ? "seller" : null);
+    : (profile?.role ?? (user ? "seller" : null));
   const isAdmin = isExplicitAdmin;
   const isSeller = role === "seller" || role === "admin";
 

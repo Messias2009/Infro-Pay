@@ -1,12 +1,4 @@
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  where,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { collection, getDocs, query, orderBy, where, doc, getDoc } from "firebase/firestore";
 import { firestore } from "@/lib/firebase-config";
 import type { UnifiedProduct } from "@/lib/products.service";
 
@@ -116,8 +108,10 @@ export async function fetchAdminUsersWithStats(): Promise<AdminUserStats[]> {
     salesSnapshots.forEach((docSnap) => {
       const s = docSnap.data();
       const sellerId = s.sellerId || s.producer_id || s.seller_id;
-      const gross = Number(s.grossAmount ?? s.amount ?? s.gross_cents ? (s.gross_cents ?? 0) / 100 : 0) || 0;
-      const net = Number(s.sellerNetAmount ?? s.net_cents ? (s.net_cents ?? 0) / 100 : gross * 0.98) || 0;
+      const gross =
+        Number((s.grossAmount ?? s.amount ?? s.gross_cents) ? (s.gross_cents ?? 0) / 100 : 0) || 0;
+      const net =
+        Number((s.sellerNetAmount ?? s.net_cents) ? (s.net_cents ?? 0) / 100 : gross * 0.98) || 0;
       const isPaid = s.status === "pago" || s.status === "completed" || s.status === "paid";
 
       if (sellerId && usersMap.has(sellerId)) {
@@ -185,8 +179,12 @@ export async function fetchUserProductsAndSales(userId: string): Promise<{
       const data = docSnap.data();
       const sellerId = data.sellerId || data.producer_id || data.seller_id;
       if (sellerId === userId) {
-        const gross = Number(data.grossAmount ?? (data.gross_cents ? data.gross_cents / 100 : data.amount ?? 0));
-        const net = Number(data.sellerNetAmount ?? (data.net_cents ? data.net_cents / 100 : gross * 0.98));
+        const gross = Number(
+          data.grossAmount ?? (data.gross_cents ? data.gross_cents / 100 : (data.amount ?? 0)),
+        );
+        const net = Number(
+          data.sellerNetAmount ?? (data.net_cents ? data.net_cents / 100 : gross * 0.98),
+        );
 
         userSales.push({
           id: docSnap.id,
@@ -207,9 +205,7 @@ export async function fetchUserProductsAndSales(userId: string): Promise<{
     userProducts.sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
-    userSales.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+    userSales.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return {
       products: userProducts,

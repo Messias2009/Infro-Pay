@@ -452,7 +452,11 @@ export function AdminDashboardView() {
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden shrink-0 border border-border">
                             {prod.cover_url ? (
-                              <img src={prod.cover_url} alt="" className="h-full w-full object-cover" />
+                              <img
+                                src={prod.cover_url}
+                                alt=""
+                                className="h-full w-full object-cover"
+                              />
                             ) : (
                               <Package className="h-5 w-5 text-muted-foreground/60" />
                             )}
