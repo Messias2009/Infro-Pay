@@ -318,6 +318,30 @@
         "createdAt": { "type": "string", "description": "ISO timestamp" }
       },
       "required": ["id", "adminId", "title", "message", "audience", "createdAt"]
+    },
+    "CheckoutConfig": {
+      "title": "CheckoutConfig",
+      "description": "Seller custom checkout configuration and visual builder preferences",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Config unique ID (seller_UID or product_ID)" },
+        "sellerId": { "type": "string", "description": "Seller Auth UID" },
+        "productId": { "type": "string", "description": "Product ID or null for global config" },
+        "status": { "type": "string", "enum": ["draft", "published"], "description": "Config state" },
+        "model": { "type": "string", "enum": ["simples", "conversao", "oferta", "personalizado"], "description": "Selected model archetype" },
+        "personality": { "type": "string", "description": "Personality preset" },
+        "primaryColor": { "type": "string", "description": "Primary accent color hex" },
+        "secondaryColor": { "type": "string", "description": "Secondary color hex" },
+        "cardRadius": { "type": "string", "description": "Border radius for cards" },
+        "buttonRadius": { "type": "string", "description": "Border radius for buttons" },
+        "ctaEnabled": { "type": "boolean", "description": "Whether custom CTA is enabled" },
+        "ctaText": { "type": "string", "description": "Button CTA text" },
+        "showOffer": { "type": "boolean", "description": "Whether special offer banner is shown" },
+        "showCountdown": { "type": "boolean", "description": "Whether countdown timer is active" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "sellerId", "model", "status", "createdAt"]
     }
   },
   "firestore": {
@@ -368,6 +392,10 @@
     "/admin_broadcasts/{broadcastId}": {
       "schema": { "$ref": "#/entities/AdminBroadcast" },
       "description": "Platform broadcast announcements"
+    },
+    "/checkout_configs/{configId}": {
+      "schema": { "$ref": "#/entities/CheckoutConfig" },
+      "description": "Seller customized checkout layout and features configuration"
     }
   }
 }

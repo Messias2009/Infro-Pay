@@ -1,0 +1,1 @@
+var e=`/assets/banner-produtores-BWUbuewR.jpg`;export{e as t};

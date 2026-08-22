@@ -1,0 +1,1 @@
+var e=`/assets/infropay-mark-BjMKOOoB.png`;export{e as t};

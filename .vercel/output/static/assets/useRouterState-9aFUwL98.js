@@ -1,0 +1,1 @@
+import{t as e}from"./useRouter-BetBaiZi.js";import{t}from"./useStore-C5ngzebl.js";import{ut as n}from"./index-CtATN6Hy.js";function r(r){let i=e({warn:r?.router===void 0}),a=r?.router||i;if(a.isServer){let e=a.stores.__store.get();return r?.select?r.select(e):e}return t(a.stores.__store,n(r,a))}export{r as t};

@@ -18,6 +18,7 @@ import {
   TrendingUp,
   GraduationCap,
   Handshake,
+  Palette,
 } from "lucide-react";
 import logoMark from "@/assets/infropay-mark.png";
 import { isAdmin as isAdminFn } from "@/lib/admin.functions";
@@ -37,6 +38,7 @@ const items = [
   { to: "/produtor/produtos", icon: Package, label: "Produtos" },
   { to: "/produtor/novo", icon: Plus, label: "Novo produto" },
   { to: "/produtor/funil", icon: TrendingUp, label: "Funil de vendas" },
+  { to: "/produtor/personalizar-checkout", icon: Palette, label: "Personalizar Checkout" },
   { to: "/membros", icon: GraduationCap, label: "Área de membros" },
   { to: "/produtor/financeiro", icon: Wallet, label: "Financeiro" },
   { to: "/produtor/saques", icon: Banknote, label: "Saques" },

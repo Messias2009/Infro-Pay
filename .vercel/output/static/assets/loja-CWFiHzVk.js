@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-dev-runtime-BsTk6-E6.js";var t=e(),n=`/app/applet/src/routes/loja.tsx?tsr-split=notFoundComponent`,r=()=>(0,t.jsxDEV)(`div`,{className:`p-10`,children:`Não encontrado.`},void 0,!1,{fileName:n,lineNumber:1,columnNumber:38},void 0);export{r as notFoundComponent};

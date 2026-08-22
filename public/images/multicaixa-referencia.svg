@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" rx="36" fill="#002744"/>
+  <g transform="translate(100, 78)">
+    <g transform="rotate(0)">
+      <path d="M -13,-18 L -9,-42 L 9,-42 L 13,-18 Z" fill="#C62828" stroke="#FFB800" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M -5,-38 L -5,-22" stroke="#FFB800" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="rotate(45)">
+      <path d="M -13,-18 L -9,-42 L 9,-42 L 13,-18 Z" fill="#C62828" stroke="#FFB800" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M -5,-38 L -5,-22" stroke="#FFB800" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="rotate(90)">
+      <path d="M -13,-18 L -9,-42 L 9,-42 L 13,-18 Z" fill="#C62828" stroke="#FFB800" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M -5,-38 L -5,-22" stroke="#FFB800" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="rotate(135)">
+      <path d="M -13,-18 L -9,-42 L 9,-42 L 13,-18 Z" fill="#C62828" stroke="#FFB800" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M -5,-38 L -5,-22" stroke="#FFB800" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="rotate(180)">
+      <path d="M -13,-18 L -9,-42 L 9,-42 L 13,-18 Z" fill="#C62828" stroke="#FFB800" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M -5,-38 L -5,-22" stroke="#FFB800" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="rotate(225)">
+      <path d="M -13,-18 L -9,-42 L 9,-42 L 13,-18 Z" fill="#C62828" stroke="#FFB800" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M -5,-38 L -5,-22" stroke="#FFB800" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="rotate(270)">
+      <path d="M -13,-18 L -9,-42 L 9,-42 L 13,-18 Z" fill="#C62828" stroke="#FFB800" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M -5,-38 L -5,-22" stroke="#FFB800" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="rotate(315)">
+      <path d="M -13,-18 L -9,-42 L 9,-42 L 13,-18 Z" fill="#C62828" stroke="#FFB800" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M -5,-38 L -5,-22" stroke="#FFB800" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <circle cx="0" cy="0" r="16" fill="#FFB800"/>
+    <circle cx="0" cy="0" r="10" fill="#002744"/>
+  </g>
+  <text x="100" y="166" text-anchor="middle" fill="#FFFFFF" font-size="24" font-weight="700" font-family="system-ui, -apple-system, sans-serif" letter-spacing="1px">multicaixa</text>
+</svg>

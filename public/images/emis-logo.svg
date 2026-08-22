@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70">
+  <g transform="skewX(-15) translate(20, 10)">
+    <rect x="0" y="0" width="52" height="46" rx="9" fill="#FF6E00"/>
+    <path d="M 12,22 L 40,22" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="95" y="48" fill="#002855" font-size="46" font-weight="900" font-style="italic" font-family="system-ui, -apple-system, sans-serif" letter-spacing="-1px">emis</text>
+</svg>

@@ -14,6 +14,12 @@ import {
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  MulticaixaExpressLogo,
+  MulticaixaLogo,
+  EmisLogo,
+  EmisVerifiedBadge,
+} from "@/components/ui/PaymentLogos";
 import { getOrderByToken } from "@/lib/checkout.functions";
 import { referenceForMethod } from "@/lib/payments.config";
 
@@ -296,7 +302,20 @@ function Pedido() {
             </div>
             <dl className="space-y-2.5 text-xs sm:text-sm">
               <Row k="Estado" v={paid ? "Pago / Confirmado" : "Pendente"} />
-              <Row k="Método" v={METHOD_LABEL[o.payment_method] ?? o.payment_method} />
+              <Row
+                k="Método"
+                v={
+                  <div className="inline-flex items-center gap-1.5 justify-end">
+                    {o.payment_method === "multicaixa_express" && (
+                      <MulticaixaExpressLogo className="h-4 w-4" rounded="rounded-xs" />
+                    )}
+                    {o.payment_method === "referencia" && (
+                      <MulticaixaLogo className="h-4 w-4" rounded="rounded-xs" />
+                    )}
+                    <span>{METHOD_LABEL[o.payment_method] ?? o.payment_method}</span>
+                  </div>
+                }
+              />
               <Row k="Comprador" v={o.buyer_name ?? "-"} />
               <Row k="Email" v={o.buyer_email ?? "-"} />
               <Row k="Data" v={new Date(o.created_at).toLocaleString("pt-PT")} />
@@ -329,8 +348,23 @@ function Pedido() {
         {!paid && payRef && (
           <div className="mt-6 sm:mt-8 rounded-2xl border border-gold/40 bg-gold/5 p-4 sm:p-8 shadow-card w-full overflow-hidden">
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div className="text-sm sm:text-base font-bold uppercase tracking-wider text-gold">
-                Instruções de Pagamento — {payRef.provider}
+              <div className="flex items-center gap-3">
+                {o.payment_method === "multicaixa_express" && (
+                  <MulticaixaExpressLogo className="h-9 w-9" rounded="rounded-xl" />
+                )}
+                {o.payment_method === "referencia" && (
+                  <MulticaixaLogo className="h-9 w-9" rounded="rounded-xl" />
+                )}
+                <div>
+                  <div className="text-sm sm:text-base font-bold uppercase tracking-wider text-gold">
+                    Instruções de Pagamento — {payRef.provider}
+                  </div>
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-0.5">
+                    <span>Processado via Rede</span>
+                    <EmisLogo className="h-3.5 w-auto" />
+                    <span className="font-semibold text-foreground">EMIS Angola</span>
+                  </div>
+                </div>
               </div>
               {payRef.mode === "test" && (
                 <span className="rounded-full border border-warning/40 bg-warning/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-warning">
@@ -354,6 +388,21 @@ function Pedido() {
                   <li key={i}>{i}</li>
                 ))}
               </ol>
+            </div>
+
+            {/* EMIS Assurance Footnote */}
+            <div className="mt-6 pt-4 border-t border-gold/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-card/60 p-3 sm:p-4 rounded-xl border border-border/80">
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="h-5 w-5 text-emerald-500 shrink-0" />
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">Transação Protegida:</span> Pagamento
+                  auditado e assegurado pela infraestrutura interbancária da{" "}
+                  <strong>EMIS</strong> (Angola).
+                </div>
+              </div>
+              <div className="flex items-center gap-2 self-end sm:self-center">
+                <EmisLogo className="h-5 w-auto" />
+              </div>
             </div>
           </div>
         )}

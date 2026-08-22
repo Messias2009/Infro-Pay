@@ -1,0 +1,1 @@
+import{n as e,r as t,t as n}from"./useBaseQuery-B0ki8YSn.js";import{$ as r}from"./index-CtATN6Hy.js";function i(i,a){return i.queryFn===r&&console.error(`skipToken is not allowed for useSuspenseQuery`),n({...i,enabled:!0,suspense:!0,throwOnError:e,placeholderData:void 0},t,a)}export{i as t};

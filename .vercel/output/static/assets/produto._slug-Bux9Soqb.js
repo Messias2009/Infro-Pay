@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-dev-runtime-BsTk6-E6.js";var t=e(),n=`/app/applet/src/routes/produto.$slug.tsx?tsr-split=errorComponent`,r=({error:e})=>(0,t.jsxDEV)(`div`,{className:`p-10 text-center text-sm text-destructive`,children:e.message},void 0,!1,{fileName:n,lineNumber:3,columnNumber:7},void 0);export{r as errorComponent};

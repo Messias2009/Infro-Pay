@@ -1,0 +1,1 @@
+var e=`infropay_ref`;function t(){if(typeof window>`u`)return{};try{return JSON.parse(window.localStorage.getItem(e)??`{}`)}catch{return{}}}function n(n,r){if(typeof window>`u`)return;let i=t();i[n]={code:r,at:Date.now()};try{window.localStorage.setItem(e,JSON.stringify(i))}catch{}}function r(e){let n=t()[e];return!n||Date.now()-n.at>2592e6?null:n.code}export{n,r as t};
