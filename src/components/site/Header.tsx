@@ -28,10 +28,10 @@ export function Header({ variant = "default" }: { variant?: HeaderVariant }) {
   if (variant === "checkout") {
     return (
       <header className="sticky top-0 z-50 border-b border-border/60 glass w-full">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-6 gap-2 w-full">
-          <Link to="/" className="flex items-center gap-2 group shrink-0">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-center gap-3 sm:gap-6 px-3 sm:px-6 w-full">
+          <div className="flex items-center gap-2 shrink-0">
             <div className="relative h-8 w-8 sm:h-9 sm:w-9 shrink-0">
-              <div className="absolute inset-0 rounded-lg blur-md gradient-brand opacity-50 group-hover:opacity-100 transition" />
+              <div className="absolute inset-0 rounded-lg blur-md gradient-brand opacity-50" />
               <img
                 src={logoMark}
                 alt="InfroPay"
@@ -44,16 +44,17 @@ export function Header({ variant = "default" }: { variant?: HeaderVariant }) {
               <div className="text-base sm:text-lg font-bold tracking-tight">
                 Infro<span className="text-gradient-gold">Pay</span>
               </div>
-              <div className="text-xs text-muted-foreground -mt-0.5">Checkout Seguro</div>
+              <div className="text-[11px] sm:text-xs text-muted-foreground -mt-0.5 font-medium">
+                Checkout Seguro
+              </div>
             </div>
-          </Link>
+          </div>
+
+          <div className="h-5 w-[1px] bg-border/80" />
 
           <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground bg-card/80 border border-border/60 rounded-full px-2.5 sm:px-3.5 py-1.5 shadow-sm shrink-0">
-            <ShieldCheck className="h-4 w-4 text-success shrink-0" />
-            <span className="font-semibold text-foreground hidden sm:inline">
-              Ambiente 100% Seguro
-            </span>
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
+            <span className="text-xs text-muted-foreground flex items-center gap-1 font-semibold">
               <Lock className="h-3 w-3 text-primary shrink-0" /> SSL 256-bit
             </span>
           </div>

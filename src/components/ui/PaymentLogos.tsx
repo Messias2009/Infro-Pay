@@ -1,5 +1,12 @@
-import React from "react";
-import { ShieldCheck, CheckCircle2, Lock } from "lucide-react";
+import React, { useState } from "react";
+import { ShieldCheck, CheckCircle2, Lock, Info, ExternalLink } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 /**
  * Logotipo oficial do Multicaixa Express (Imagem 1)
@@ -301,6 +308,110 @@ export function EmisVerifiedBadge({
 }
 
 /**
+ * Badge da EMIS com Fundo Branco Oficial e Link "Saber mais"
+ * Fundo branco sólido (#FFFFFF) para contraste perfeito das cores oficiais (Laranja e Azul Escuro).
+ */
+export function EmisWhiteBadge({
+  className = "",
+  showLearnMore = true,
+}: {
+  className?: string;
+  showLearnMore?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <div
+        className={`inline-flex items-center gap-3 rounded-xl border border-slate-200/90 bg-white px-3.5 py-2 shadow-xs transition-all hover:shadow-sm ${className}`}
+      >
+        <div className="flex items-center gap-2.5 shrink-0">
+          <EmisLogo className="h-5 sm:h-6 w-auto" />
+          <div className="h-6 w-[1px] bg-slate-200" />
+        </div>
+
+        <div className="min-w-0 text-left">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="font-extrabold text-xs sm:text-[13px] text-[#002855] leading-tight">
+              Pagamentos Assegurados pela EMIS
+            </span>
+          </div>
+          <span className="block text-[10px] sm:text-[11px] text-slate-500 font-medium leading-none mt-0.5">
+            Rede Interbancária Oficial de Angola
+          </span>
+        </div>
+
+        {showLearnMore && (
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-[#002855] hover:text-[#FF6E00] underline decoration-slate-300 hover:decoration-[#FF6E00] underline-offset-2 transition-colors cursor-pointer shrink-0 pl-1"
+          >
+            Saber mais
+          </button>
+        )}
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md bg-white text-slate-900 border-slate-200">
+          <DialogHeader className="text-left space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-[#002855]/10 grid place-items-center shrink-0">
+                <ShieldCheck className="h-6 w-6 text-[#002855]" />
+              </div>
+              <div>
+                <DialogTitle className="text-base font-bold text-[#002855]">
+                  Pagamentos Assegurados pela EMIS
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-500">
+                  Empresa Interbancária de Serviços S.A.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-3.5 text-xs text-slate-600 leading-relaxed pt-2">
+            <div className="flex items-center justify-center p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <EmisLogo className="h-8 w-auto" />
+            </div>
+
+            <p>
+              A <strong>EMIS (Empresa Interbancária de Serviços S.A.)</strong> é a entidade gestora da rede
+              interbancária de Angola, regulada e supervisionada pelo <strong>Banco Nacional de Angola (BNA)</strong>.
+            </p>
+
+            <div className="space-y-2 rounded-xl bg-slate-50 p-3 border border-slate-100 text-slate-700">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                <span>
+                  <strong>Multicaixa Express:</strong> Transações processadas em tempo real com autorização segura no seu aplicativo bancário.
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                <span>
+                  <strong>Referência Multicaixa:</strong> Pagamentos via Caixas Automáticos (ATM) e Homebanking em qualquer banco angolano.
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                <span>
+                  <strong>Criptografia Bancária:</strong> Todos os dados trafegam sob protocolos de segurança de 256 bits com liquidação direta.
+                </span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-500">
+              Na InfroPay, todas as transações em Kwanza (AOA) cumprem integralmente as diretrizes do Sistema de Pagamentos de Angola (SPA).
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+/**
  * Barra de Métodos de Pagamento e Selos
  */
 export function PaymentMethodsBadgesRow({ className = "" }: { className?: string }) {
@@ -323,3 +434,4 @@ export function PaymentMethodsBadgesRow({ className = "" }: { className?: string
     </div>
   );
 }
+

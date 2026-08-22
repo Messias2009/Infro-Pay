@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useMemo } from "react";
@@ -200,18 +200,18 @@ function CheckoutBuilderPage() {
   // Current active preview product
   const activeProduct = useMemo(() => {
     if (selectedProductId !== "global") {
-      const p = myProducts.find((item: any) => item.id === selectedProductId);
+      const p = (myProducts as any[])?.find((item: any) => item.id === selectedProductId);
       if (p) {
         return {
           id: p.id,
-          title: p.title || p.name || "Produto Digital Selecionado",
-          cover_url: p.cover_url || p.image,
-          price_cents: p.price_cents || (p.price ? Math.round(p.price * 100) : 1500000),
+          title: p.title || (p as any).name || "Produto Digital Selecionado",
+          cover_url: p.cover_url || (p as any).image,
+          price_cents: p.price_cents || ((p as any).price ? Math.round((p as any).price * 100) : 1500000),
           promo_price_cents: p.promo_price_cents,
           currency: p.currency || "AOA",
           slug: p.slug || "produto-exemplo",
-          guarantee_days: p.guarantee_days ?? 7,
-          short_description: p.short_description || "Acesso completo e suporte",
+          guarantee_days: (p as any).guarantee_days ?? 7,
+          short_description: (p as any).short_description || "Acesso completo e suporte",
         };
       }
     }
@@ -368,7 +368,44 @@ function CheckoutBuilderPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] w-full overflow-hidden bg-background">
+    <>
+      {/* MOBILE / TABLET RESTRICTION SCREEN (< 1024px) */}
+      <div className="lg:hidden flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] p-4 sm:p-6 text-center">
+        <div className="max-w-md w-full rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-card space-y-5 animate-fade-in">
+          <div className="h-16 w-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary grid place-items-center mx-auto shadow-glow">
+            <Monitor className="h-8 w-8" />
+          </div>
+
+          <div className="space-y-2">
+            <Badge
+              variant="outline"
+              className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-xs px-2.5 py-0.5 font-semibold"
+            >
+              Disponível Apenas no Computador
+            </Badge>
+            <h2 className="text-lg sm:text-xl font-bold text-foreground">
+              Esta funcionalidade está disponível apenas no computador.
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Por favor, acesse pelo desktop para personalizar seu checkout. O editor visual em 3
+              colunas com personalização ao vivo necessita de uma tela ampla para uma experiência
+              perfeita.
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-col gap-2.5">
+            <Button asChild className="w-full h-10 gradient-brand font-semibold shadow-glow">
+              <Link to="/produtor">Voltar ao Painel do Produtor</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full h-10 border-border/80 text-xs">
+              <Link to="/produtor/produtos">Gerir Meus Produtos</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* DESKTOP BUILDER WORKSPACE (>= 1024px) */}
+      <div className="hidden lg:flex flex-col h-[calc(100vh-4rem)] w-full overflow-hidden bg-background">
       {/* TOP HEADER TOOLBAR */}
       <header className="h-16 border-b border-border/80 bg-card/60 backdrop-blur px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0 z-20">
         <div className="flex items-center gap-3 min-w-0">
@@ -1168,25 +1205,6 @@ function CheckoutBuilderPage() {
                     }
                   />
                 </div>
-
-                <div className="flex items-center justify-between p-2.5 rounded-xl border border-border bg-background/50">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                    <div>
-                      <div className="font-bold text-xs">Transferência Bancária</div>
-                      <div className="text-[10px] text-muted-foreground">Comprovativo manual com IBAN direto</div>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={config.paymentMethods.transferencia}
-                    onCheckedChange={(v) =>
-                      updateConfig((c) => ({
-                        ...c,
-                        paymentMethods: { ...c.paymentMethods, transferencia: v },
-                      }))
-                    }
-                  />
-                </div>
               </div>
             </div>
           )}
@@ -1465,5 +1483,6 @@ function CheckoutBuilderPage() {
         </aside>
       </div>
     </div>
+    </>
   );
 }

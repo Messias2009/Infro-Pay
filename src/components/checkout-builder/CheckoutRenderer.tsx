@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import {
   ShieldCheck,
   Lock,
-  ArrowLeft,
-  Building2,
   Zap,
   CheckCircle2,
   Gift,
@@ -22,7 +20,6 @@ import { Label } from "@/components/ui/label";
 import {
   MulticaixaExpressLogo,
   MulticaixaLogo,
-  EmisVerifiedBadge,
 } from "@/components/ui/PaymentLogos";
 import { CheckoutTimer } from "./CheckoutTimer";
 import {
@@ -33,8 +30,6 @@ import {
   getCtaStyleClasses,
 } from "./checkout-utils";
 import type { CheckoutCustomizationConfig } from "@/types/checkout-builder";
-import logoImg from "@/assets/infropay-logo.png";
-import markImg from "@/assets/infropay-mark.png";
 
 interface CheckoutRendererProps {
   config: CheckoutCustomizationConfig;
@@ -84,14 +79,6 @@ const ALL_PAYMENT_METHODS = [
     desc: "Pague em qualquer Caixa Automático (ATM) ou Internet Banking",
     type: "logo",
     logo: MulticaixaLogo,
-  },
-  {
-    id: "transferencia",
-    label: "Transferência Bancária",
-    badge: "IBAN Direto",
-    desc: "Transferência interbancária com envio simples de comprovativo",
-    type: "icon",
-    icon: Building2,
   },
 ];
 
@@ -193,63 +180,7 @@ export function CheckoutRenderer({
         color: config.customTextColor || undefined,
       }}
     >
-      <div className="mx-auto w-full max-w-6xl px-3 sm:px-6 py-4 sm:py-8">
-        {/* 1. TOP HEADER / BRAND BAR */}
-        {config.showTopHeader && (
-          <div
-            onClick={(e) => handleClickSection("identity", e)}
-            className={`flex items-center justify-between gap-3 pb-4 mb-6 border-b border-border/60 w-full flex-wrap sm:flex-nowrap ${getSelectionBorder(
-              "identity",
-            )}`}
-          >
-            {product.slug && !isPreview ? (
-              <Link
-                to="/produto/$slug"
-                params={{ slug: product.slug }}
-                className="inline-flex items-center text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition shrink-0"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1.5 shrink-0" /> Voltar aos detalhes
-              </Link>
-            ) : (
-              <div className="inline-flex items-center text-xs sm:text-sm font-medium text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 mr-1.5 text-emerald-500 shrink-0" /> Ambiente Seguro
-              </div>
-            )}
-
-            <div className="flex items-center gap-3 shrink-0">
-              {config.showBrandLogo && config.brandLogoUrl ? (
-                <img
-                  src={config.brandLogoUrl}
-                  alt={config.brandName || "Logo"}
-                  className="h-8 max-w-[140px] object-contain rounded"
-                />
-              ) : config.showBrandLogo && config.brandName ? (
-                <span className="font-bold text-sm sm:text-base text-foreground">
-                  {config.brandName}
-                </span>
-              ) : null}
-
-              {config.showInfropayBadge && (
-                <div className="flex items-center gap-2">
-                  <img
-                    src={logoImg}
-                    alt="InfroPay"
-                    className="h-6 w-auto object-contain hidden sm:block opacity-90 hover:opacity-100"
-                  />
-                  <img
-                    src={markImg}
-                    alt="InfroPay"
-                    className="h-6 w-6 object-contain sm:hidden"
-                  />
-                  <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80 pl-2 border-l border-border">
-                    <Lock className="h-3 w-3 text-gold shrink-0" /> 100% Seguro
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
+      <div className="mx-auto w-full max-w-6xl px-3 sm:px-6 py-4 sm:py-6">
         {/* 2. PROMOTIONAL OFFER BANNER (Se ativado e não for checkout simples) */}
         {!isSimples && config.showOffer && (
           <div
@@ -427,33 +358,20 @@ export function CheckoutRenderer({
                 ) : (
                   availableMethods.map((m) => {
                     const active = activeMethod === m.id;
-                    const Logo = "logo" in m ? m.logo : null;
-                    const Icon = "icon" in m ? m.icon : null;
+                    const Logo = m.logo;
 
                     return (
                       <button
                         type="button"
                         key={m.id}
-                        onClick={() => setMethod(m.id)}
+                        onClick={() => (setMethod as (m: string) => void)(m.id)}
                         className={`relative flex items-start sm:items-center gap-3 sm:gap-4 rounded-xl border p-3.5 sm:p-4 text-left transition-all w-full cursor-pointer min-w-0 ${
                           active
                             ? "border-primary bg-primary/10 shadow-glow ring-1 ring-primary/40"
                             : "border-border/80 bg-background/50 hover:border-primary/40 hover:bg-secondary/30"
                         }`}
                       >
-                        {Logo ? (
-                          <Logo className="h-11 w-11 shrink-0 rounded-xl" />
-                        ) : Icon ? (
-                          <div
-                            className={`h-11 w-11 rounded-xl grid place-items-center shrink-0 ${
-                              active
-                                ? "gradient-brand text-primary-foreground shadow-md"
-                                : "bg-secondary text-muted-foreground"
-                            }`}
-                          >
-                            <Icon className="h-5 w-5" />
-                          </div>
-                        ) : null}
+                        {Logo && <Logo className="h-11 w-11 shrink-0 rounded-xl" />}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-sm sm:text-base text-foreground">
@@ -483,9 +401,6 @@ export function CheckoutRenderer({
                   })
                 )}
               </div>
-
-              {/* EMIS VERIFIED BADGE (Se ativado) */}
-              {config.showEmisBadge && <EmisVerifiedBadge variant="banner" className="mt-4" />}
             </section>
 
             {/* SECTION 3: ORDER BUMP (Se existir, ativado e NÃO for checkout simples) */}
@@ -788,25 +703,25 @@ export function CheckoutRenderer({
             {!isSimples && config.showBenefits && config.benefitsList?.length > 0 && (
               <div
                 onClick={(e) => handleClickSection("benefits", e)}
-                className={`border border-border bg-card p-4 sm:p-6 space-y-4 shadow-card w-full min-w-0 ${cardRadiusClass} ${getSelectionBorder(
+                className={`border border-border bg-card p-3 sm:p-4 space-y-2.5 shadow-card w-full min-w-0 ${cardRadiusClass} ${getSelectionBorder(
                   "benefits",
                 )}`}
                 style={{ backgroundColor: config.customCardBgColor || undefined }}
               >
-                <div className="text-xs sm:text-sm font-bold uppercase tracking-widest text-gold flex items-center gap-1.5">
+                <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
                   <Sparkles className="h-3.5 w-3.5 text-gold shrink-0" /> Benefícios Inclusos
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {config.benefitsList.map((b) => (
-                    <div key={b.id} className="flex gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-gold/10 grid place-items-center shrink-0">
-                        {renderBenefitIcon(b.icon, "h-4 w-4 text-gold shrink-0")}
+                    <div key={b.id} className="flex items-start gap-2.5">
+                      <div className="h-6 w-6 rounded-md bg-gold/10 grid place-items-center shrink-0 mt-0.5">
+                        {renderBenefitIcon(b.icon, "h-3.5 w-3.5 text-gold shrink-0")}
                       </div>
-                      <div className="text-xs sm:text-sm">
-                        <div className="font-semibold text-foreground">{b.title}</div>
+                      <div className="text-xs min-w-0">
+                        <div className="font-semibold text-foreground leading-tight">{b.title}</div>
                         {b.desc && (
-                          <div className="text-muted-foreground mt-0.5 leading-relaxed">
+                          <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
                             {b.desc}
                           </div>
                         )}
@@ -821,23 +736,23 @@ export function CheckoutRenderer({
             {!isSimples && config.showTestimonials && config.testimonialsList?.length > 0 && (
               <div
                 onClick={(e) => handleClickSection("testimonials", e)}
-                className={`border border-border bg-card p-4 sm:p-6 space-y-4 shadow-card w-full min-w-0 ${cardRadiusClass} ${getSelectionBorder(
+                className={`border border-border bg-card p-3 sm:p-4 space-y-3 shadow-card w-full min-w-0 ${cardRadiusClass} ${getSelectionBorder(
                   "testimonials",
                 )}`}
                 style={{ backgroundColor: config.customCardBgColor || undefined }}
               >
-                <div className="text-xs sm:text-sm font-bold uppercase tracking-widest text-gold flex items-center gap-1.5">
+                <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
                   <Star className="h-3.5 w-3.5 text-gold fill-gold shrink-0" /> Quem Comprou Recomenda
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {config.testimonialsList.map((t) => (
                     <div
                       key={t.id}
-                      className="p-3 rounded-xl bg-secondary/40 border border-border/50 space-y-2"
+                      className="p-2.5 rounded-lg bg-secondary/40 border border-border/50 space-y-1.5"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <div className="font-bold text-xs sm:text-sm text-foreground">{t.name}</div>
+                        <div className="font-bold text-xs text-foreground">{t.name}</div>
                         <div className="flex gap-0.5">
                           {Array.from({ length: t.rating || 5 }).map((_, i) => (
                             <Star
@@ -847,7 +762,7 @@ export function CheckoutRenderer({
                           ))}
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground italic leading-relaxed">
+                      <p className="text-[11px] text-muted-foreground italic leading-relaxed">
                         "{t.text}"
                       </p>
                       {t.role && (
@@ -865,50 +780,50 @@ export function CheckoutRenderer({
             {config.showGuarantee && (
               <div
                 onClick={(e) => handleClickSection("guarantee", e)}
-                className={`border border-border bg-card p-4 sm:p-6 space-y-4 shadow-card w-full min-w-0 ${cardRadiusClass} ${getSelectionBorder(
+                className={`border border-border bg-card p-3 sm:p-4 space-y-2.5 shadow-card w-full min-w-0 ${cardRadiusClass} ${getSelectionBorder(
                   "guarantee",
                 )}`}
                 style={{ backgroundColor: config.customCardBgColor || undefined }}
               >
-                <div className="text-xs sm:text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Garantia e Segurança
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-success/10 grid place-items-center shrink-0">
-                      <ShieldCheck className="h-4 w-4 text-success shrink-0" />
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2.5">
+                    <div className="h-6 w-6 rounded-md bg-success/10 grid place-items-center shrink-0 mt-0.5">
+                      <ShieldCheck className="h-3.5 w-3.5 text-success shrink-0" />
                     </div>
-                    <div className="text-xs sm:text-sm">
-                      <div className="font-semibold text-foreground">
+                    <div className="text-xs min-w-0">
+                      <div className="font-semibold text-foreground leading-tight">
                         Garantia de {config.guaranteeDays ?? product.guarantee_days ?? 7} dias
                       </div>
-                      <div className="text-muted-foreground mt-0.5 leading-relaxed">
+                      <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
                         {config.guaranteeText ||
                           "Satisfação 100% garantida ou seu dinheiro de volta sem complicações."}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-gold/10 grid place-items-center shrink-0">
-                      <Zap className="h-4 w-4 text-gold shrink-0" />
+                  <div className="flex items-start gap-2.5">
+                    <div className="h-6 w-6 rounded-md bg-gold/10 grid place-items-center shrink-0 mt-0.5">
+                      <Zap className="h-3.5 w-3.5 text-gold shrink-0" />
                     </div>
-                    <div className="text-xs sm:text-sm">
-                      <div className="font-semibold text-foreground">Acesso Imediato</div>
-                      <div className="text-muted-foreground mt-0.5 leading-relaxed">
+                    <div className="text-xs min-w-0">
+                      <div className="font-semibold text-foreground leading-tight">Acesso Imediato</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
                         Receba o link de download e instruções logo após a confirmação.
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 grid place-items-center shrink-0">
-                      <Lock className="h-4 w-4 text-primary shrink-0" />
+                  <div className="flex items-start gap-2.5">
+                    <div className="h-6 w-6 rounded-md bg-primary/10 grid place-items-center shrink-0 mt-0.5">
+                      <Lock className="h-3.5 w-3.5 text-primary shrink-0" />
                     </div>
-                    <div className="text-xs sm:text-sm">
-                      <div className="font-semibold text-foreground">Dados 100% Protegidos</div>
-                      <div className="text-muted-foreground mt-0.5 leading-relaxed">
+                    <div className="text-xs min-w-0">
+                      <div className="font-semibold text-foreground leading-tight">Dados 100% Protegidos</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
                         Processamento encriptado e seguro pela infraestrutura InfroPay.
                       </div>
                     </div>

@@ -245,6 +245,24 @@ export async function fetchCheckoutConfig(
   return buildDefaultConfig(sellerId, productId);
 }
 
+function sanitizeForFirestore<T extends Record<string, any>>(obj: T): Record<string, any> {
+  const clean: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      if (Array.isArray(value)) {
+        clean[key] = value.map((item) =>
+          item !== null && typeof item === "object" ? sanitizeForFirestore(item) : item,
+        );
+      } else if (value !== null && typeof value === "object") {
+        clean[key] = sanitizeForFirestore(value);
+      } else {
+        clean[key] = value;
+      }
+    }
+  }
+  return clean;
+}
+
 export async function saveCheckoutConfig(
   config: CheckoutCustomizationConfig,
   isPublish: boolean = false,
@@ -271,13 +289,14 @@ export async function saveCheckoutConfig(
   // 2. Persist to Firestore
   try {
     const docRef = doc(firestore, "checkout_configs", config.id);
-    await setDoc(docRef, {
+    const sanitized = sanitizeForFirestore({
       ...updated,
       serverUpdatedAt: serverTimestamp(),
-    }, { merge: true });
+    });
+    await setDoc(docRef, sanitized, { merge: true });
   } catch (error) {
-    console.error("Failed to save to Firestore", error);
-    // Don't throw if client cached, but report
+    console.warn("Notice saving to Firestore:", error);
+    // Don't fail the client flow if local cache succeeded
   }
 
   return updated;
@@ -300,12 +319,13 @@ export async function resetCheckoutConfig(
 
   try {
     const docRef = doc(firestore, "checkout_configs", configId);
-    await setDoc(docRef, {
+    const sanitized = sanitizeForFirestore({
       ...defaultConfig,
       serverUpdatedAt: serverTimestamp(),
     });
+    await setDoc(docRef, sanitized);
   } catch (error) {
-    console.warn("Failed to reset in Firestore:", error);
+    console.warn("Notice resetting in Firestore:", error);
   }
 
   return defaultConfig;

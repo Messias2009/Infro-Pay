@@ -6,21 +6,12 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-const isVercel = Boolean(process.env.VERCEL || process.env.NOW_BUILDER);
-const targetPreset = process.env.NITRO_PRESET || (isVercel ? "vercel" : undefined);
+const targetPreset = process.env.NITRO_PRESET || "vercel";
 
 export default defineConfig({
   nitro: {
-    ...(targetPreset ? { preset: targetPreset } : {}),
-    ...(isVercel
-      ? {}
-      : {
-          output: {
-            dir: "dist",
-            serverDir: "dist/server",
-            publicDir: "dist",
-          },
-        }),
+    preset: targetPreset,
   },
 });
+
 

@@ -69,27 +69,29 @@ function Checkout() {
 
   const getConfigServerFn = useServerFn(getCheckoutConfigFn);
 
+  const sellerId = (p as any)?.seller_id || (p as any)?.producer_id || null;
+
   // Load seller or product custom checkout configuration
   const { data: checkoutConfig } = useQuery({
-    queryKey: ["checkout-config-public", p?.seller_id, p?.id],
+    queryKey: ["checkout-config-public", sellerId, p?.id],
     queryFn: () =>
-      p?.seller_id
+      sellerId && p?.id
         ? getConfigServerFn({
             data: {
-              sellerId: p.seller_id,
+              sellerId,
               productId: p.id,
               includeDraft: false,
             },
           })
         : Promise.resolve(null),
-    enabled: !!p?.seller_id,
+    enabled: !!(sellerId && p?.id),
     staleTime: 60_000,
   });
 
   const activeConfig: CheckoutCustomizationConfig = useMemo(() => {
     if (checkoutConfig) return checkoutConfig;
-    return buildDefaultConfig(p?.seller_id || "seller_default", p?.id);
-  }, [checkoutConfig, p?.seller_id, p?.id]);
+    return buildDefaultConfig(sellerId || "seller_default", p?.id);
+  }, [checkoutConfig, sellerId, p?.id]);
 
   const { data: tracking } = useQuery({
     queryKey: ["tracking", "product", slug],
@@ -204,7 +206,7 @@ function Checkout() {
           promo_price_cents: p.promo_price_cents,
           currency: p.currency,
           slug: p.slug,
-          guarantee_days: p.guarantee_days,
+          guarantee_days: p.guarantee_days ?? undefined,
           short_description: p.short_description,
           description: p.description,
         }}
